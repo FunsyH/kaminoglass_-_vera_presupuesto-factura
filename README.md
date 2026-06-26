@@ -18,7 +18,7 @@ Una sola plantilla sirve para las dos marcas (cambia color y logo) y en dos idio
 
 ## Cómo se ve
 
-En `ejemplos/` tienes 4 PDF de muestra ya generados (mismo evento de prueba,
+En `output/ejemplos/` tienes 4 PDF de muestra ya generados (mismo evento de prueba,
 "Roca Lisa · 40 pax"):
 
 | Archivo | Marca | Idioma |
@@ -32,7 +32,7 @@ En `ejemplos/` tienes 4 PDF de muestra ya generados (mismo evento de prueba,
 
 ## Cómo usarla (paso a paso)
 
-1. Abre **`templates/presupuesto.html`** con doble clic (se abre en tu navegador:
+1. Abre **`output/templates/presupuesto.html`** con doble clic (se abre en tu navegador:
    Chrome recomendado).
 2. Arriba a la derecha hay un **panel de control** (solo se ve en pantalla, no sale en
    el PDF). Elige:
@@ -41,9 +41,10 @@ En `ejemplos/` tienes 4 PDF de muestra ya generados (mismo evento de prueba,
 3. Cuando se vea como quieres: **Archivo → Imprimir** (o `Cmd + P`).
    - **Destino**: "Guardar como PDF".
    - **Tamaño de papel**: A4.
-   - **Márgenes**: Ninguno.
-   - **Gráficos de fondo / Background graphics**: ACTIVADO (importante, si no se pierde
-     el color del TOTAL y el filete lateral).
+   - **Encabezados y pies de página**: DESACTIVADO (si no, el navegador añade la
+     fecha arriba y la URL abajo, que no queremos).
+   - Los colores del TOTAL y el filete lateral salen siempre: el CSS los fuerza con
+     `print-color-adjust: exact`, así que ya **no** hace falta activar "Gráficos de fondo".
 4. Guarda. Ya tienes el PDF listo para enviar al cliente.
 
 > El panel de control y el menú de imprimir **no** aparecen en el PDF: están marcados
@@ -53,7 +54,7 @@ En `ejemplos/` tienes 4 PDF de muestra ya generados (mismo evento de prueba,
 
 ## Cómo cambiar el contenido de cada presupuesto
 
-Por ahora se edita a mano en `templates/presupuesto.html` (en la futura app esto será
+Por ahora se edita a mano en `output/templates/presupuesto.html` (en la futura app esto será
 un formulario). Lo que cambia en cada presupuesto:
 
 - **Título del evento**: busca `class="event-title"` → "Roca Lisa · 40 pax".
@@ -113,7 +114,7 @@ VERA todavía no tiene un archivo de logo. De momento usamos un **logotipo "VERA
 tipográfico minimal** (texto + "EQUIPMENT &amp; RENTALS"), pensado como propuesta de
 dirección: limpio, sobrio, de empresa de materiales premium — sin la estética japonesa
 de KNG. Cuando tengas el logo definitivo de VERA, se sustituye en un minuto.
-La referencia del logo antiguo está en `templates/assets/logo-vera-ORIGINAL-referencia.png`.
+La referencia del logo antiguo está en `output/templates/assets/logo-vera-ORIGINAL-referencia.png`.
 
 ---
 
@@ -122,12 +123,16 @@ La referencia del logo antiguo está en `templates/assets/logo-vera-ORIGINAL-ref
 ```
 kaminoglass_&_vera_presupuesto&factura/
 ├── README.md                     ← este archivo
-├── templates/
-│   ├── presupuesto.html          ← la plantilla (se abre y se imprime a PDF)
-│   └── assets/
-│       ├── logo-kng.png          ← logo Kami No Glass
-│       └── logo-vera-ORIGINAL-referencia.png  ← logo viejo de Vera (referencia)
-└── ejemplos/                     ← 4 PDF de muestra (KNG/VERA × ES/EN)
+├── frontend/                     ← la app React + Vite (formulario + PDF en vivo)
+│   └── src/                      ← código fuente (componentes, datos, estilos)
+└── output/                       ← TODO lo generado/de referencia va aquí
+    ├── templates/
+    │   ├── presupuesto.html      ← la plantilla original (se abre e imprime a PDF)
+    │   └── assets/
+    │       ├── logo-kng.png      ← logo Kami No Glass
+    │       └── logo-vera-ORIGINAL-referencia.png  ← logo viejo de Vera (referencia)
+    ├── ejemplos/                 ← 4 PDF de muestra (KNG/VERA × ES/EN)
+    └── docs/                     ← specs y planes de diseño
 ```
 
 ---
