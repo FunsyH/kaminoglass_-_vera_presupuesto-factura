@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos base de la INTERFAZ (no del documento PDF, que vive en documento.css). */
+body {
+  margin: 0;
+  font-family: 'acumin-pro', system-ui, sans-serif;
+  background: #ece9e2; /* gris cálido neutro para que el documento resalte */
+}
+
+/* En impresión, la UI desaparece: solo se imprime el documento.
+   Estas reglas trabajan junto con las de documento.css. */
+@media print {
+  body { background: #fff; }
+}

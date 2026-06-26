@@ -1,0 +1,32 @@
+# Dependencias (se reinstalan con npm install — nunca se suben)
+node_modules/
+frontend/node_modules/
+
+# Builds y salidas de Vite
+dist/
+frontend/dist/
+*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Variables de entorno (pueden tener secretos — nunca al repo)
+.env
+.env.*
+!.env.example
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Scratch / temporales
+*.log
+.cache/

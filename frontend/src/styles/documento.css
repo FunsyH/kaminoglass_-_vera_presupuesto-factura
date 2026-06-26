@@ -1,0 +1,575 @@
+/* ===========================================================================
+   documento.css — Estilos del DOCUMENTO (el PDF), migrados de templates/presupuesto.html
+   ---------------------------------------------------------------------------
+   IMPORTANTE: este CSS NO usa Tailwind. Está en milímetros para impresión A4 fiel.
+   Cambio clave respecto a la plantilla: el documento ya NO tiene páginas de altura
+   fija; fluye de forma natural y el navegador lo pagina al imprimir (ver @media print).
+   =========================================================================== */
+
+/* Todo se acota bajo .documento para no afectar a la interfaz del formulario. */
+.documento * { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Fuerza a imprimir los fondos de color (dorado, azul, filete, marca de agua)
+   aunque el usuario NO active "Gráficos de fondo" en el diálogo de impresión.
+   Sin esto, el PDF sale "en blanco" comparado con la app. */
+.documento, .documento * {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.documento {
+  /* Medidas A4 */
+  --page-w: 210mm;
+  --pad: 18mm;
+
+  /* --- Paleta KNG (dorado / tinta sobre crema) --- */
+  --kng-ink:    #1a1714;
+  --kng-gold:   #b8954a;
+  --kng-gold-d: #9c7a36;
+  --kng-cream:  #faf6ec;
+  --kng-paper:  #ffffff;
+  --kng-soft:   #efe7d6;
+  --kng-muted:  #7a7163;
+
+  /* --- Paleta VERA (azul marino minimal sobre hueso) --- */
+  --vera-ink:   #15202e;
+  --vera-blue:  #1e3a5f;
+  --vera-blue-d:#142a47;
+  --vera-paper: #ffffff;
+  --vera-bone:  #f5f6f8;
+  --vera-soft:  #e3e8ef;
+  --vera-muted: #6b7686;
+
+  font-family: "acumin-pro", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Tokens activos según marca (se reasignan con [data-brand]) */
+.documento[data-brand="kng"] {
+  --ink: var(--kng-ink); --accent: var(--kng-gold); --accent-d: var(--kng-gold-d);
+  --bg: var(--kng-cream); --paper: var(--kng-paper); --soft: var(--kng-soft); --muted: var(--kng-muted);
+}
+.documento[data-brand="vera"] {
+  --ink: var(--vera-ink); --accent: var(--vera-blue); --accent-d: var(--vera-blue-d);
+  --bg: var(--vera-bone); --paper: var(--vera-paper); --soft: var(--vera-soft); --muted: var(--vera-muted);
+}
+
+.documento .display { font-family: "utopia-std-headline", "Georgia", serif; }
+
+/* ===========================================================
+   HOJA A4 — ahora de flujo natural (no altura fija)
+   =========================================================== */
+.documento .page {
+  position: relative;
+  width: var(--page-w);
+  margin: 0 auto 8mm;
+  padding: var(--pad);
+  padding-left: calc(var(--pad) + 5mm); /* espacio para el filete de acento */
+  /* Fondo = color de la marca + franja de acento de 5mm a la izquierda.
+     Usar gradiente (no un elemento aparte) mantiene el filete dentro del flujo
+     de cada hoja, sin romper la paginación al imprimir. */
+  background-image: linear-gradient(
+    to right,
+    var(--accent) 0, var(--accent) 5mm,
+    var(--bg) 5mm, var(--bg) 100%
+  );
+  box-shadow: 0 6px 30px rgba(0,0,0,.18);
+  display: flex;
+  flex-direction: column;
+}
+/* Solo en pantalla la página aparenta una A4 completa (con su pie al fondo).
+   En impresión NO se fija altura: el contenido fluye y el navegador pagina. */
+@media screen {
+  .documento .page { min-height: 297mm; }
+}
+
+/* ===========================================================
+   CABECERA
+   =========================================================== */
+.documento .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 3mm;
+  border-bottom: 0.4mm solid var(--soft);
+}
+
+.documento .logo-kng { width: 24mm; height: auto; display: block; }
+
+.documento .logo-vera .wordmark {
+  font-family: "utopia-std-headline", serif;
+  font-size: 17mm;
+  line-height: .9;
+  letter-spacing: .14em;
+  color: var(--vera-blue);
+  font-weight: 400;
+}
+.documento .logo-vera .tag {
+  margin-top: 1mm;
+  font-size: 2.5mm;
+  letter-spacing: .42em;
+  text-transform: uppercase;
+  color: var(--vera-muted);
+}
+
+.documento .company {
+  text-align: right;
+  font-size: 2.9mm;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.documento .company .name {
+  font-family: "utopia-std-headline", serif;
+  font-size: 4.2mm;
+  letter-spacing: .02em;
+  color: var(--ink);
+  margin-bottom: 1mm;
+}
+.documento .company .cif { color: var(--accent-d); font-weight: 600; letter-spacing: .04em; }
+
+/* ===========================================================
+   TÍTULO / DATOS DEL EVENTO
+   =========================================================== */
+.documento .doc-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;   /* "PRESUPUESTO" y la referencia alineados arriba */
+  margin-top: 2mm;
+}
+.documento .doc-kind {
+  font-size: 3mm;
+  letter-spacing: .42em;
+  text-transform: uppercase;
+  color: var(--accent-d);
+  margin-bottom: 1.5mm;
+}
+.documento .event-title {
+  font-family: "utopia-std-headline", serif;
+  font-size: 6mm;
+  line-height: 1.05;
+  color: var(--ink);
+  max-width: 120mm;
+}
+.documento .doc-ref {
+  text-align: right;
+  font-size: 2.9mm;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.documento .doc-ref b { color: var(--ink); font-weight: 600; }
+
+.documento .event-sub {
+  margin-top: 0;
+  font-size: 3.1mm;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+.documento .event-sub span { color: var(--ink); }
+.documento .event-sub .dot { color: var(--accent); margin: 0 2mm; }
+
+/* ===========================================================
+   SECCIONES DE PARTIDAS (TABLAS)
+   =========================================================== */
+.documento .section { margin-top: 4mm; }
+.documento .section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 3mm;
+  margin-bottom: 1.5mm;
+}
+.documento .section-title h3 {
+  font-family: "utopia-std-headline", serif;
+  font-size: 4.6mm;
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: .01em;
+}
+.documento .section-title .rule {
+  flex: 1;
+  height: .3mm;
+  background: var(--soft);
+}
+
+/* Tabla de líneas de cada sección (.lineas). Acotado para NO afectar a la
+   tabla maestra .doc-table (que también tiene thead/tbody/tfoot). */
+.documento .lineas { width: 100%; border-collapse: collapse; }
+.documento .lineas thead th {
+  font-size: 2.7mm;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 0 0 2.4mm 0;
+  border-bottom: .3mm solid var(--soft);
+}
+.documento .lineas th.num, .documento .lineas td.num { text-align: right; white-space: nowrap; }
+.documento .lineas th.qty, .documento .lineas td.qty { text-align: center; width: 16mm; white-space: nowrap; }
+.documento .lineas th.unit, .documento .lineas td.unit { width: 26mm; }
+.documento .lineas td.amt { width: 28mm; }
+
+.documento .lineas tbody td {
+  font-size: 3.2mm;
+  color: var(--ink);
+  padding: 1.8mm 0;
+  border-bottom: .25mm solid var(--soft);
+  vertical-align: middle;
+}
+.documento .lineas tbody td.qty { font-size: 3.2mm; color: var(--ink); font-weight: 600; }
+.documento .lineas tbody td .desc-main { font-weight: 600; font-size: 3.2mm; }
+.documento .lineas tbody td .desc-note { font-size: 2.6mm; color: var(--muted); margin-top: .5mm; }
+.documento .lineas tbody td.amt { font-weight: 700; font-size: 3.4mm; }
+
+/* Fila de subtotal de sección (opcional) */
+.documento .lineas tr.subtotal td {
+  border-bottom: none;
+  padding-top: 2mm;
+  font-size: 3.2mm;
+  color: var(--muted);
+  font-weight: 600;
+}
+.documento .lineas tr.subtotal td.amt { color: var(--ink); }
+
+/* ===========================================================
+   TOTALES
+   =========================================================== */
+.documento .totals {
+  margin-top: 3mm;
+  display: flex;
+  justify-content: flex-end;
+}
+.documento .totals-box { width: 78mm; }
+.documento .totals-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 3.6mm;
+  padding: 1.8mm 0;
+  color: var(--muted);
+}
+.documento .totals-row span:last-child { color: var(--ink); font-weight: 600; }
+.documento .totals-row.grand {
+  margin-top: 1.5mm;
+  padding: 3.5mm 4mm;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 1mm;
+}
+.documento .totals-row.grand span { color: #fff; }
+.documento .totals-row.grand .label {
+  font-family: "utopia-std-headline", serif;
+  font-size: 4.4mm;
+  letter-spacing: .04em;
+}
+.documento .totals-row.grand .value {
+  font-family: "utopia-std-headline", serif;
+  font-size: 5.4mm;
+  font-weight: 700;
+}
+
+/* ===========================================================
+   CONDICIONES (tarjeta) + PIE
+   =========================================================== */
+.documento .terms {
+  margin-bottom: 5mm;
+  padding: 3.5mm 5mm;
+  background: var(--paper);
+  border: .25mm solid var(--soft);
+  border-left: 1.2mm solid var(--accent);
+  border-radius: 1mm;
+}
+.documento .terms h4 {
+  font-size: 2.8mm;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent-d);
+  margin-bottom: 2mm;
+}
+.documento .terms p {
+  font-size: 3mm;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.documento .foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 3mm;
+  border-top: .3mm solid var(--soft);
+  font-size: 2.6mm;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+.documento .foot .web { color: var(--accent-d); font-weight: 600; letter-spacing: .08em; }
+
+/* ===========================================================
+   PÁGINA 2 — TÉRMINOS Y CONDICIONES
+   =========================================================== */
+.documento .terms-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 3mm;
+  border-bottom: .4mm solid var(--soft);
+  margin-bottom: 4mm;
+}
+.documento .terms-head .tt-title {
+  font-family: "utopia-std-headline", serif;
+  font-size: 6.4mm;
+  color: var(--ink);
+  line-height: 1.05;
+  max-width: 130mm;
+}
+.documento .terms-head .tt-brand {
+  font-size: 2.7mm;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--accent-d);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.documento .clauses {
+  column-count: 2;
+  column-gap: 9mm;
+  column-fill: balance;
+  flex: 1;
+}
+.documento .clause {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  margin-bottom: 4.2mm;
+}
+.documento .clause h5 {
+  font-size: 2.9mm;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: .01em;
+  margin-bottom: 1mm;
+}
+.documento .clause h5 .num { color: var(--accent-d); margin-right: 1.2mm; }
+.documento .clause p {
+  font-size: 2.55mm;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* ===========================================================
+   MARCA DE AGUA (logo de fondo, centrado y muy tenue)
+   ---
+   En PANTALLA: una por página (.page la posiciona, centrada en cada hoja).
+   En IMPRESIÓN: pasa a position:fixed para centrarse en CADA hoja física y
+   así NUNCA partirse entre dos hojas (era el problema que se veía en el PDF).
+   =========================================================== */
+.documento .marca-agua {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;           /* SIEMPRE detrás del contenido (incluso al imprimir) */
+  pointer-events: none;
+  user-select: none;
+}
+/* En pantalla la centramos en la primera hoja (referencia visual); lo que
+   importa de verdad es la impresión, donde se fija a cada hoja (más abajo). */
+@media screen {
+  .documento .marca-agua { top: 148mm; } /* ~mitad de una A4 */
+}
+/* KNG: el círculo Enzo, grande y muy tenue */
+.documento .marca-agua-kng {
+  width: 120mm;
+  height: auto;
+  opacity: 0.04;
+}
+/* VERA: el wordmark gigante, tenue, en el azul de marca */
+.documento .marca-agua-vera {
+  font-family: "utopia-std-headline", serif;
+  font-size: 64mm;
+  letter-spacing: .1em;
+  color: var(--vera-blue);
+  opacity: 0.05;
+  white-space: nowrap;
+}
+
+/* El contenido de la página va por encima de la marca de agua. */
+.documento .head,
+.documento .doc-meta,
+.documento .event-sub,
+.documento .section,
+.documento .totals,
+.documento .terms,
+.documento .terms-head,
+.documento .clauses,
+.documento .foot {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===========================================================
+   TABLA MAESTRA (página 1) — cabecera/pie repetidos por hoja
+   ---
+   El truco: thead -> table-header-group y tfoot -> table-footer-group hacen
+   que el navegador REPITA la cabecera y el pie en cada hoja al imprimir,
+   de forma nativa. El contenido va en tbody y fluye.
+   =========================================================== */
+.documento .doc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.documento .doc-table > thead { display: table-header-group; }
+.documento .doc-table > tfoot { display: table-footer-group; }
+/* La cabecera de marca lleva su separación inferior; el pie, superior. */
+.documento .doc-table > thead .head { margin-bottom: 2mm; }
+/* El espaciador del tfoot hereda de .foot (mismo alto) pero sin margin:auto
+   (no aplica en celda de tabla) y con una separación superior fija. */
+.documento .doc-table > tfoot .foot-espaciador { margin-top: 4mm; }
+
+/* En PANTALLA, la tabla maestra (página 1) parece una hoja A4 como .page. */
+@media screen {
+  .documento .doc-table {
+    display: block;
+    width: var(--page-w);
+    min-height: 297mm;
+    margin: 0 auto 8mm;
+    padding: 18mm;
+    padding-left: 23mm;
+    background-image: linear-gradient(
+      to right, var(--accent) 0, var(--accent) 5mm, var(--bg) 5mm, var(--bg) 100%
+    );
+    box-shadow: 0 6px 30px rgba(0,0,0,.18);
+  }
+  /* La tabla maestra en pantalla es una columna flex: el cuerpo crece y
+     empuja el pie al fondo de la hoja, haya pocos o muchos ítems. */
+  .documento .doc-table { display: flex; flex-direction: column; }
+  .documento .doc-table > thead,
+  .documento .doc-table > tfoot,
+  .documento .doc-table > thead > tr,
+  .documento .doc-table > tfoot > tr,
+  .documento .doc-table > tbody > tr,
+  .documento .doc-table > thead > tr > td,
+  .documento .doc-table > tfoot > tr > td,
+  .documento .doc-table > tbody > tr > td {
+    display: block;
+  }
+  .documento .doc-table > tbody { display: block; flex: 1; }   /* el cuerpo ocupa el alto disponible */
+  .documento .doc-table > tfoot { margin-top: auto; }          /* el pie, al fondo */
+}
+
+.documento .nota-aceptacion {
+  margin-top: 6mm;
+  font-size: 2.6mm;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* En pantalla: .documento es el ancestro posicionado de referencia para
+   .marca-agua (position:absolute). Además el pie fijo se ancla al fondo de la
+   primera hoja A4 como referencia visual (en impresión se repite en cada hoja).
+   Los espaciadores del pie no deben ocupar hueco visible en pantalla. */
+@media screen {
+  .documento { position: relative; }
+  .documento .foot-fijo {
+    position: absolute;
+    left: 23mm; right: 18mm;
+    top: calc(297mm - 18mm);   /* cerca del fondo de la 1ª hoja A4 */
+  }
+  .documento .foot-espaciador,
+  .documento .foot-espaciador-pagina { display: none; }
+}
+
+/* ===========================================================
+   IMPRESIÓN / PDF
+   ---
+   El @page reserva 12mm arriba y 20mm abajo en CADA hoja. La cabecera se
+   repite vía thead (table-header-group). El pie es un footer position:fixed
+   (.foot-fijo) anclado al fondo de cada hoja física dentro del margen inferior
+   de @page, así queda SIEMPRE pegado abajo. El <tfoot> y un espaciador en la
+   página 2 reservan ese hueco (invisibles) para que el contenido no lo invada.
+   =========================================================== */
+@page { size: A4; margin: 12mm 0 20mm 0; }
+
+@media print {
+  /* Oculta toda la interfaz; solo se imprime el documento. */
+  .no-print { display: none !important; }
+
+  /* Neutraliza el layout de la app (flex + scroll) para que el documento
+     no quede recortado a la altura de pantalla al imprimir. */
+  html, body, #root { height: auto !important; overflow: visible !important; }
+  .app-layout { display: block !important; }
+  .zona-documento {
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  /* La tabla maestra vuelve a comportarse como tabla normal en impresión. */
+  .documento .doc-table { display: table; width: 100%; }
+  .documento .doc-table > thead { display: table-header-group; }
+  .documento .doc-table > tbody { display: table-row-group; }
+
+  /* El contenido respeta 18mm laterales; el vertical lo da @page. */
+  .documento .doc-table > thead > tr > td,
+  .documento .doc-table > tbody > tr > td,
+  .documento .doc-table > tfoot > tr > td {
+    padding: 0 18mm;
+  }
+
+  /* La página 2 (condiciones) empieza en hoja nueva. */
+  .documento .page {
+    margin: 0; box-shadow: none; min-height: 0;
+    padding: 0 18mm;
+    background-image: none;
+    display: block;
+  }
+  .documento .pagina-condiciones { break-before: page; }
+
+  /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
+  .documento::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 5mm; height: 100%;
+    background: var(--accent);
+  }
+
+  /* Marca de agua: fija respecto a la hoja física, centrada, en cada página. */
+  .documento .marca-agua {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* --- PIE DE PÁGINA VISIBLE: anclado al fondo de CADA hoja física ---
+     Vive dentro del margen inferior de 20mm que reserva @page, así nunca
+     tapa contenido (el contenido no entra en ese margen) y queda siempre
+     pegado abajo, haya mucho o poco contenido en la hoja. */
+  .documento .foot-fijo {
+    position: fixed;
+    left: 23mm; right: 18mm;   /* 18mm + 5mm del filete de acento a la izquierda */
+    bottom: 6mm;               /* dentro del margen inferior reservado por @page */
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 3mm;
+    border-top: .3mm solid var(--soft);
+    background: transparent;
+  }
+
+  /* El <tfoot> y el espaciador de la página 2 reservan el hueco del pie pero
+     NO se ven: el pie visible es el .foot-fijo de arriba. Sin esto, el
+     contenido llegaría al borde y el pie fixed lo taparía. */
+  .documento .foot-espaciador { visibility: hidden; }
+  .documento .foot-espaciador-pagina { height: 16mm; }
+
+  /* Reglas de paginación: no partir filas de líneas/cláusulas. */
+  .documento .lineas tr, .documento .clause { break-inside: avoid; }
+  .documento .section-title { break-after: avoid; }
+  .documento .totals { break-inside: avoid; }
+  .documento .terms { break-inside: avoid; }
+}
