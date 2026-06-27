@@ -238,7 +238,7 @@
 .documento .totals {
   margin-top: 3mm;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;   /* bloque de totales a la IZQUIERDA */
 }
 .documento .totals-box { width: 78mm; }
 .documento .totals-row {
