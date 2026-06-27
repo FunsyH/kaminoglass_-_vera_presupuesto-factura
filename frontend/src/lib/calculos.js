@@ -66,7 +66,11 @@ export function subtotalSeccion(section) {
 }
 
 // Devuelve { base, iva, total } SIEMPRE consistentes: base + iva === total.
-// quote = { sections, totalMode: 'auto'|'manual', manualTotal?, ivaRate (p.ej 0.21) }
+// quote = { sections, totalMode, manualTotal?, manualBase?, ivaRate (p.ej 0.21) }
+// totalMode:
+//   'auto'       -> base = suma de líneas; iva encima.
+//   'manual'     -> el usuario teclea el TOTAL final (con IVA); se desglosa atrás.
+//   'manualBase' -> el usuario teclea la BASE (sin IVA); se le suma el IVA encima.
 export function calcularTotales(quote) {
   // Protección: si no llega un quote válido, devolvemos todo a cero.
   if (!quote || typeof quote !== 'object') {
@@ -78,6 +82,10 @@ export function calcularTotales(quote) {
 
   if (quote.totalMode === 'manual') {
     return calcularManual(quote.manualTotal, ivaRate);
+  }
+
+  if (quote.totalMode === 'manualBase') {
+    return calcularManualBase(quote.manualBase, ivaRate);
   }
 
   // Por defecto (y para 'auto') calculamos desde las líneas.
@@ -112,6 +120,21 @@ function calcularManual(manualTotal, ivaRate) {
   // Por qué: al redondear base puede perderse un céntimo; restando garantizamos
   // que base + iva === total EXACTAMENTE, sin descuadres.
   const iva = redondear2(total - base);
+
+  return { base, iva, total };
+}
+
+// Modo 'manualBase': el usuario teclea la BASE (sin IVA); sumamos el IVA encima.
+function calcularManualBase(manualBase, ivaRate) {
+  // Protección: si la base manual no es válida, devolvemos ceros.
+  if (!esNumeroValido(manualBase)) {
+    return { base: 0, iva: 0, total: 0 };
+  }
+
+  const base = redondear2(manualBase);
+  const iva = redondear2(base * ivaRate);
+  // total = base + iva con ambos YA redondeados, para que base + iva === total.
+  const total = redondear2(base + iva);
 
   return { base, iva, total };
 }

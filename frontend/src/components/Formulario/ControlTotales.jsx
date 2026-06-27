@@ -4,6 +4,7 @@ import { formatEuro } from '../../lib/formato'
 // Controla cómo se calcula el total:
 // - 'auto': suma de las líneas (+ IVA 21% encima).
 // - 'manual': el usuario teclea el total final (con IVA); se desglosa hacia atrás.
+// - 'manualBase': el usuario teclea la base (sin IVA); se le suma el IVA encima.
 function ControlTotales({ quote, setQuote }) {
   const { base, iva, total } = calcularTotales(quote)
 
@@ -14,6 +15,11 @@ function ControlTotales({ quote, setQuote }) {
   function cambiarTotalManual(texto) {
     const n = texto === '' ? null : Number(texto)
     setQuote((q) => ({ ...q, manualTotal: Number.isNaN(n) ? null : n }))
+  }
+
+  function cambiarBaseManual(texto) {
+    const n = texto === '' ? null : Number(texto)
+    setQuote((q) => ({ ...q, manualBase: Number.isNaN(n) ? null : n }))
   }
 
   return (
@@ -35,7 +41,15 @@ function ControlTotales({ quote, setQuote }) {
             checked={quote.totalMode === 'manual'}
             onChange={() => cambiarModo('manual')}
           />
-          Total a mano
+          Total a mano (con IVA)
+        </label>
+        <label className="flex items-center gap-1">
+          <input
+            type="radio"
+            checked={quote.totalMode === 'manualBase'}
+            onChange={() => cambiarModo('manualBase')}
+          />
+          Base a mano (sin IVA)
         </label>
       </div>
 
@@ -46,6 +60,18 @@ function ControlTotales({ quote, setQuote }) {
             type="number"
             value={quote.manualTotal ?? ''}
             onChange={(e) => cambiarTotalManual(e.target.value)}
+            className="w-40 rounded border border-gray-300 px-2 py-1 text-sm focus:border-kng-gold focus:outline-none"
+          />
+        </label>
+      ) : null}
+
+      {quote.totalMode === 'manualBase' ? (
+        <label className="block mb-2">
+          <span className="block text-xs text-gray-500 mb-0.5">Base imponible (sin IVA)</span>
+          <input
+            type="number"
+            value={quote.manualBase ?? ''}
+            onChange={(e) => cambiarBaseManual(e.target.value)}
             className="w-40 rounded border border-gray-300 px-2 py-1 text-sm focus:border-kng-gold focus:outline-none"
           />
         </label>

@@ -70,6 +70,7 @@ export function crearQuoteInicial() {
     ],
     totalMode: 'auto',
     manualTotal: null,
+    manualBase: null,
     ivaRate: 0.21,
   };
 }
