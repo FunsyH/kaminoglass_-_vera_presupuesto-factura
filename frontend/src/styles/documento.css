@@ -162,6 +162,7 @@
 
 .documento .event-sub {
   margin-top: 0;
+  margin-bottom: 6mm;   /* separa el subtítulo de la cabecera de columnas */
   font-size: 3.1mm;
   letter-spacing: .02em;
   color: var(--muted);
