@@ -254,10 +254,10 @@
   margin-top: 0.55mm;        /* mitad del espacio anterior (IVA <-> cuadro) */
   padding: 1.5mm 4mm;        /* mitad del padding vertical (linea <-> TOTAL) */
   background: var(--accent);
-  color: #fff;
+  color: var(--ink);         /* tinta oscura sobre dorado: maxima legibilidad y look premium */
   border-radius: 1mm;
 }
-.documento .totals-row.grand span { color: #fff; }
+.documento .totals-row.grand span { color: var(--ink); }
 .documento .totals-row.grand .label {
   font-family: "utopia-std-headline", serif;
   font-size: 4.4mm;
