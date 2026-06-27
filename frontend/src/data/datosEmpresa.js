@@ -24,10 +24,12 @@ export const datosEmpresa = {
         'info@kng-group.com',
         '+34 671 821 215 · Adrián',
         '+34 671 821 213 · Camilla',
-        'www.kaminoglasscatering.com',
+        '@ibizabarcatering',
+        'kaminoglasscatering.vercel.app',
       ],
+      // Web temporal (despliegue) hasta que la web oficial esté lista.
       footerNombre: 'Kami No Glass Group SL · Ibiza',
-      web: 'www.kaminoglasscatering.com',
+      web: 'kaminoglasscatering.vercel.app',
     },
     en: {
       nombre: 'Kami No Glass Group SL',
@@ -37,10 +39,12 @@ export const datosEmpresa = {
         'info@kng-group.com',
         '+34 671 821 215 · Adrián',
         '+34 671 821 213 · Camilla',
-        'www.kaminoglasscatering.com',
+        '@ibizabarcatering',
+        'kaminoglasscatering.vercel.app',
       ],
+      // Web temporal (despliegue) hasta que la web oficial esté lista.
       footerNombre: 'Kami No Glass Group SL · Ibiza',
-      web: 'www.kaminoglasscatering.com',
+      web: 'kaminoglasscatering.vercel.app',
     },
   },
 

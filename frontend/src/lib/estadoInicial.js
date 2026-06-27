@@ -64,3 +64,70 @@ export function crearQuoteInicial() {
     ivaRate: 0.21,
   };
 }
+
+// Presupuesto "Open Bar July · Villa Los Olivos" migrado del formato viejo (PDF
+// en inglés). Total a mano SIN IVA = 11.140 €. Secciones con su total en el
+// título (en modo sin IVA no se muestran columnas de importe).
+// Para usarlo: en App.jsx, useState(crearQuoteOpenBarLosOlivos) en vez de crearQuoteInicial.
+export function crearQuoteOpenBarLosOlivos() {
+  const linea = (description, note) => ({ description, note: note || '', qty: null, unitPrice: null });
+  return {
+    brand: 'kng',
+    lang: 'en',
+    event: {
+      title: 'Open Bar July with Limo · 30/50 pax · Villa Los Olivos',
+      dateText: '16:00 till 03:00am',
+      place: 'Villa Los Olivos',
+      serviceText: '11 h of service + 4 h closing and set up · Option 1',
+      docNumber: NUMERO_INICIAL,
+      issueDate: fechaHoy(),
+      validityDays: '15',
+    },
+    sections: [
+      {
+        id: 's1', title: 'Staff (15 hours service) — approx 3.000 €', showSubtotal: false,
+        items: [
+          linea('1 Bar Manager', '40 €/h'),
+          linea('2 Barman', '35 €/h'),
+          linea('2 Waiter', '30 €/h'),
+          linea('1 Cleaner', '30 €/h'),
+        ],
+      },
+      {
+        id: 's2', title: 'Rentals — 1.740 €', showSubtotal: false,
+        items: [
+          linea('2 Master bar'),
+          linea('2 Bar back'),
+          linea('4 Trash bins'),
+          linea('Equipment for cocktails and event'),
+          linea('Glassware'),
+          linea('10 Ashtrays'),
+        ],
+      },
+      {
+        id: 's3', title: 'Extras — 1.900 €', showSubtotal: false,
+        items: [
+          linea('Ice delivery with freezer'),
+          linea('Rubbish collection'),
+          linea('Transport and collection'),
+          linea('Organization fee and bar consulting'),
+          linea('Fruit shopping for cocktails'),
+        ],
+      },
+      {
+        id: 's4', title: 'Open Bar — 4.500 €', showSubtotal: false,
+        items: [
+          linea('3/4 cocktails of choice, signature or classics'),
+          linea('Full open bar with wine, rosé, red & champagne', 'White Albariño Mar de Frades · Côte de Provence Mirabal · Rivera del Duero Pago de Capellanes · Non Dosé Perpetuelle'),
+          linea('Full open bar with spirits', 'Tequila Don Julio Reposado · Mezcal Cómplice · Ron Diplomático Reserva Exclusiva · Vodka Grey Goose · Gin Monkey 47'),
+          linea('Full selection of soft drinks', 'Pink grapefruit soda, ginger beer, coconut water, Coca-Cola, Sprite, etc.'),
+          linea('Water station', 'Homemade lemonade, pink grapefruit lemonade with blue spirulina, ice water'),
+        ],
+      },
+    ],
+    totalMode: 'manualSinIva',
+    manualTotal: 11140,
+    manualBase: null,
+    ivaRate: 0.21,
+  };
+}
