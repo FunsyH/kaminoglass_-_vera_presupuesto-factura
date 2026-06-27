@@ -1,5 +1,6 @@
 import { condicionesContratacion, titulosTerminos, clausulas } from '../../data/textosFijos'
 import { etiquetas } from '../../data/textosFijos'
+import { datosEmpresa } from '../../data/datosEmpresa'
 
 // Página 2 del documento: condiciones de contratación (resumen) + los 10
 // Términos y Condiciones en dos columnas. Todos los textos son fijos: vienen
@@ -8,6 +9,7 @@ function PaginaCondiciones({ brand, lang }) {
   const t = etiquetas[lang]
   const titulo = titulosTerminos[brand][lang]
   const listaClausulas = clausulas[lang]
+  const empresa = datosEmpresa[brand][lang]
 
   return (
     <div className="page pagina-condiciones">
@@ -43,10 +45,12 @@ function PaginaCondiciones({ brand, lang }) {
           : 'By confirming the deposit, the client accepts these Terms & Conditions.'}
       </p>
 
-      {/* Espaciador: reserva el alto del pie fijo para que el footer global
-          (position:fixed, anclado al fondo de la hoja) no tape la última
-          cláusula ni la nota de aceptación. */}
-      <div className="foot-espaciador-pagina" aria-hidden="true" />
+      {/* Pie propio de la página 2, al fondo de la hoja (igual que en las
+          hojas A4 del presupuesto). */}
+      <footer className="foot hoja-foot">
+        <span>{empresa.footerNombre}</span>
+        <span className="web">{empresa.web}</span>
+      </footer>
     </div>
   )
 }

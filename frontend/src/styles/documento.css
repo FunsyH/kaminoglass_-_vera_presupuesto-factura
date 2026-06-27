@@ -444,6 +444,8 @@
 .documento .hoja-a4 .hoja-foot { margin-top: 3mm; }
 .documento .hoja-a4 > .hoja-foot:last-child { margin-top: auto; }
 .documento .hoja-a4 .fila-titulo td { padding-top: 4mm; }
+/* El pie propio de la página 2 (condiciones) baja al fondo de su hoja. */
+.documento .pagina-condiciones > .hoja-foot { margin-top: auto; }
 
 @media print {
   .no-print { display: none !important; }
