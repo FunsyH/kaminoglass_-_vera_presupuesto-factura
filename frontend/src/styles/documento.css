@@ -240,7 +240,7 @@
   display: flex;
   justify-content: flex-end;   /* bloque de totales a la DERECHA */
 }
-.documento .totals-box { width: 78mm; }
+.documento .totals-box { width: 92mm; }
 .documento .totals-row {
   display: flex;
   justify-content: space-between;
@@ -262,6 +262,7 @@
   font-family: "utopia-std-headline", serif;
   font-size: 4.4mm;
   letter-spacing: .04em;
+  white-space: nowrap;   /* "TOTAL (WITHOUT IVA 21%)" en una sola línea */
 }
 .documento .totals-row.grand .value {
   font-family: "utopia-std-headline", serif;
