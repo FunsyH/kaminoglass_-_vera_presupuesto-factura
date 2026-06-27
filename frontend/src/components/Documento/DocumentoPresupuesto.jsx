@@ -49,8 +49,14 @@ function DocumentoPresupuesto({ quote }) {
       alto: medidas.bloques[i] ? medidas.bloques[i].alto : 0,
     }))
     const altoCabeceras = medidas.cabeceraMarca + medidas.cabeceraTabla
-    const altoUtilPrimera = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras - medidas.metaEvento
-    const altoUtilSiguientes = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras
+    // Se resta medidas.totalFooter del alto util de TODAS las hojas (no solo
+    // la ultima), porque no sabemos de antemano cual hoja sera la ultima sin
+    // crear una dependencia circular con el propio resultado de paginar.
+    // Enfoque conservador: reservar siempre ese espacio garantiza que el
+    // total+footer (margin-top:auto) nunca se recorten en la hoja final,
+    // a cambio de un pequeno desperdicio de espacio en hojas intermedias.
+    const altoUtilPrimera = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras - medidas.metaEvento - medidas.totalFooter
+    const altoUtilSiguientes = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras - medidas.totalFooter
     return paginarBloques(conAlto, altoUtilPrimera, altoUtilSiguientes)
   }, [listo, bloquesBase, medidas])
 

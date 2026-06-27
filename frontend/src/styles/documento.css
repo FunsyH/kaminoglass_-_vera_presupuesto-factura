@@ -457,8 +457,9 @@
   .documento .hoja-a4 { margin: 0; box-shadow: none; break-after: page; }
   .documento .hoja-a4:last-of-type { break-after: auto; }
 
-  /* La pagina 2 de condiciones empieza en hoja nueva. */
-  .documento .pagina-condiciones { break-before: page; }
+  /* La pagina 2 de condiciones empieza en hoja nueva, con el mismo reset
+     de margen/sombra que las hojas A4 (consistencia entre paginas impresas). */
+  .documento .pagina-condiciones { margin: 0; box-shadow: none; break-before: page; }
 
   /* No partir filas ni clausulas. */
   .documento .lineas tr, .documento .clause { break-inside: avoid; }

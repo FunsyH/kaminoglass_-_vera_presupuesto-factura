@@ -24,7 +24,6 @@ export function useMedidasDocumento(quote) {
     const bloques = Array.from(nodosBloque).map((el) => ({
       tipo: el.getAttribute('data-tipo'),
       alto: el.getBoundingClientRect().height,
-      indice: Number(el.getAttribute('data-medir')),
     }))
 
     setMedidas({
