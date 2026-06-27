@@ -246,13 +246,13 @@
   justify-content: space-between;
   align-items: center;       /* etiqueta y monto alineados verticalmente */
   font-size: 3.6mm;
-  padding: 1.35mm 0;         /* compacto: ~3/4 del espacio anterior */
+  padding: 0.68mm 0;         /* mitad del espacio anterior (Base <-> IVA) */
   color: var(--muted);
 }
 .documento .totals-row span:last-child { color: var(--ink); font-weight: 600; }
 .documento .totals-row.grand {
-  margin-top: 1.1mm;         /* compacto: ~3/4 del espacio anterior */
-  padding: 3mm 4mm;
+  margin-top: 0.55mm;        /* mitad del espacio anterior (IVA <-> cuadro) */
+  padding: 1.5mm 4mm;        /* mitad del padding vertical (linea <-> TOTAL) */
   background: var(--accent);
   color: #fff;
   border-radius: 1mm;
