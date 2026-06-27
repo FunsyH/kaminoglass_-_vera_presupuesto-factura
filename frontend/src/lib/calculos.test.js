@@ -20,9 +20,14 @@ describe('calcularTotales', () => {
     expect(calcularTotales(quote)).toEqual({ base: 0, iva: 0, total: 0 })
   })
 
-  it("modo 'manual': desglosa el total con IVA hacia atrás", () => {
-    const quote = { totalMode: 'manual', manualTotal: 1210, ivaRate: 0.21 }
-    expect(calcularTotales(quote)).toEqual({ base: 1000, iva: 210, total: 1210 })
+  it("modo 'manualSinIva': el total escrito es el final, sin aplicar IVA", () => {
+    const quote = { totalMode: 'manualSinIva', manualTotal: 1210 }
+    expect(calcularTotales(quote)).toEqual({ base: 1210, iva: 0, total: 1210, sinIva: true })
+  })
+
+  it("modo 'manualSinIva': monto inválido -> ceros con sinIva", () => {
+    const quote = { totalMode: 'manualSinIva', manualTotal: null }
+    expect(calcularTotales(quote)).toEqual({ base: 0, iva: 0, total: 0, sinIva: true })
   })
 
   it("modo 'auto': suma líneas y añade IVA encima", () => {

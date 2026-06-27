@@ -6,7 +6,7 @@ import { formatEuro } from '../../lib/formato'
 // - 'manual': el usuario teclea el total final (con IVA); se desglosa hacia atrás.
 // - 'manualBase': el usuario teclea la base (sin IVA); se le suma el IVA encima.
 function ControlTotales({ quote, setQuote }) {
-  const { base, iva, total } = calcularTotales(quote)
+  const { base, iva, total, sinIva } = calcularTotales(quote)
 
   function cambiarModo(modo) {
     setQuote((q) => ({ ...q, totalMode: modo }))
@@ -26,36 +26,23 @@ function ControlTotales({ quote, setQuote }) {
     <div className="mb-5">
       <h2 className="text-sm font-semibold text-gray-700 mb-2">Total</h2>
 
-      <div className="flex gap-3 mb-2 text-sm">
-        <label className="flex items-center gap-1">
-          <input
-            type="radio"
-            checked={quote.totalMode === 'auto'}
-            onChange={() => cambiarModo('auto')}
-          />
-          Automático (suma de líneas)
-        </label>
-        <label className="flex items-center gap-1">
-          <input
-            type="radio"
-            checked={quote.totalMode === 'manual'}
-            onChange={() => cambiarModo('manual')}
-          />
-          Total a mano (con IVA)
-        </label>
-        <label className="flex items-center gap-1">
-          <input
-            type="radio"
-            checked={quote.totalMode === 'manualBase'}
-            onChange={() => cambiarModo('manualBase')}
-          />
-          Base a mano (sin IVA)
-        </label>
-      </div>
+      {/* Menú desplegable: más limpio que varios radios juntos. */}
+      <label className="block mb-2">
+        <span className="block text-xs text-gray-500 mb-0.5">Cómo calcular el total</span>
+        <select
+          value={quote.totalMode}
+          onChange={(e) => cambiarModo(e.target.value)}
+          className="w-full max-w-xs rounded border border-gray-300 px-2 py-1 text-sm focus:border-kng-gold focus:outline-none"
+        >
+          <option value="auto">Automático (suma de líneas)</option>
+          <option value="manualSinIva">Total a mano (sin IVA)</option>
+          <option value="manualBase">Base a mano (sin IVA, + IVA encima)</option>
+        </select>
+      </label>
 
-      {quote.totalMode === 'manual' ? (
+      {quote.totalMode === 'manualSinIva' ? (
         <label className="block mb-2">
-          <span className="block text-xs text-gray-500 mb-0.5">Total final (con IVA)</span>
+          <span className="block text-xs text-gray-500 mb-0.5">Total final (sin IVA)</span>
           <input
             type="number"
             value={quote.manualTotal ?? ''}
@@ -77,11 +64,17 @@ function ControlTotales({ quote, setQuote }) {
         </label>
       ) : null}
 
-      {/* Vista rápida del desglose (siempre con IVA) */}
+      {/* Vista rápida del desglose. En modo sin IVA solo se muestra el TOTAL. */}
       <div className="text-sm text-gray-600 bg-gray-50 rounded p-2">
-        <div>Base imponible: <b>{formatEuro(base)}</b></div>
-        <div>IVA 21%: <b>{formatEuro(iva)}</b></div>
-        <div className="text-kng-ink">TOTAL: <b>{formatEuro(total)}</b></div>
+        {sinIva ? (
+          <div className="text-kng-ink">TOTAL: <b>{formatEuro(total)}</b> <span className="text-gray-500">SIN IVA</span></div>
+        ) : (
+          <>
+            <div>Base imponible: <b>{formatEuro(base)}</b></div>
+            <div>IVA 21%: <b>{formatEuro(iva)}</b></div>
+            <div className="text-kng-ink">TOTAL: <b>{formatEuro(total)}</b></div>
+          </>
+        )}
       </div>
     </div>
   )

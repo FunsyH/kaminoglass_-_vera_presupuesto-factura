@@ -51,18 +51,26 @@ function HojaA4({ brand, lang, empresa, t, bloques, esPrimera, esUltima, metaEve
         </tbody>
       </table>
 
-      {/* Total clavado al fondo (solo ultima hoja) */}
+      {/* Total clavado al fondo (solo ultima hoja). En modo sin IVA solo se
+          muestra la fila TOTAL con la etiqueta "SIN IVA"; se omiten Base e IVA. */}
       {esUltima ? (
         <div className="totals hoja-total">
           <div className="totals-box">
-            <div className="totals-row">
-              <span>{t.baseImponible}</span><span>{formatEuro(totales.base)}</span>
-            </div>
-            <div className="totals-row">
-              <span>{t.iva}</span><span>{formatEuro(totales.iva)}</span>
-            </div>
+            {totales.sinIva ? null : (
+              <>
+                <div className="totals-row">
+                  <span>{t.baseImponible}</span><span>{formatEuro(totales.base)}</span>
+                </div>
+                <div className="totals-row">
+                  <span>{t.iva}</span><span>{formatEuro(totales.iva)}</span>
+                </div>
+              </>
+            )}
             <div className="totals-row grand">
-              <span className="label">{t.total}</span>
+              <span className="label">
+                {t.total}
+                {totales.sinIva ? <span className="total-sin-iva"> · SIN IVA</span> : null}
+              </span>
               <span className="value">{formatEuro(totales.total)}</span>
             </div>
           </div>

@@ -68,9 +68,12 @@ export function subtotalSeccion(section) {
 // Devuelve { base, iva, total } SIEMPRE consistentes: base + iva === total.
 // quote = { sections, totalMode, manualTotal?, manualBase?, ivaRate (p.ej 0.21) }
 // totalMode:
-//   'auto'       -> base = suma de líneas; iva encima.
-//   'manual'     -> el usuario teclea el TOTAL final (con IVA); se desglosa atrás.
-//   'manualBase' -> el usuario teclea la BASE (sin IVA); se le suma el IVA encima.
+//   'auto'        -> base = suma de líneas; iva encima.
+//   'manualSinIva'-> el usuario teclea el TOTAL final SIN IVA (no se aplica IVA).
+//   'manualBase'  -> el usuario teclea la BASE (sin IVA); se le suma el IVA encima.
+//
+// Nota: el resultado lleva además `sinIva: true` en el modo manualSinIva, para
+// que el documento muestre la etiqueta "SIN IVA" y omita las líneas de IVA.
 export function calcularTotales(quote) {
   // Protección: si no llega un quote válido, devolvemos todo a cero.
   if (!quote || typeof quote !== 'object') {
@@ -80,8 +83,8 @@ export function calcularTotales(quote) {
   // Si no nos dan ivaRate, usamos 0.21 (21 %) por defecto.
   const ivaRate = esNumeroValido(quote.ivaRate) ? quote.ivaRate : 0.21;
 
-  if (quote.totalMode === 'manual') {
-    return calcularManual(quote.manualTotal, ivaRate);
+  if (quote.totalMode === 'manualSinIva') {
+    return calcularManualSinIva(quote.manualTotal);
   }
 
   if (quote.totalMode === 'manualBase') {
@@ -104,24 +107,15 @@ function calcularAuto(sections, ivaRate) {
   return { base, iva, total };
 }
 
-// Modo 'manual': el total ya incluye IVA; sacamos base e iva hacia atrás.
-function calcularManual(manualTotal, ivaRate) {
-  // Protección: si el total manual no es válido, devolvemos ceros.
+// Modo 'manualSinIva': el usuario teclea el TOTAL final y NO se aplica IVA.
+// base = total, iva = 0. Devuelve sinIva:true para que el documento muestre la
+// etiqueta "SIN IVA" y omita las líneas de Base imponible e IVA.
+function calcularManualSinIva(manualTotal) {
   if (!esNumeroValido(manualTotal)) {
-    return { base: 0, iva: 0, total: 0 };
+    return { base: 0, iva: 0, total: 0, sinIva: true };
   }
-
   const total = redondear2(manualTotal);
-
-  // base = total / (1 + ivaRate). Con IVA 21 % -> total / 1.21.
-  const base = redondear2(total / (1 + ivaRate));
-
-  // IMPORTANTE: el iva lo calculamos como (total - base) en vez de (base * ivaRate).
-  // Por qué: al redondear base puede perderse un céntimo; restando garantizamos
-  // que base + iva === total EXACTAMENTE, sin descuadres.
-  const iva = redondear2(total - base);
-
-  return { base, iva, total };
+  return { base: total, iva: 0, total, sinIva: true };
 }
 
 // Modo 'manualBase': el usuario teclea la BASE (sin IVA); sumamos el IVA encima.

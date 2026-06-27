@@ -267,6 +267,15 @@
   font-size: 5.4mm;
   font-weight: 700;
 }
+/* Etiqueta "SIN IVA" junto al TOTAL (modo manualSinIva): pequeña y sobria,
+   en sans, no en la serif del título, para que se lea como aclaración. */
+.documento .totals-row.grand .total-sin-iva {
+  font-family: "acumin-pro", Arial, sans-serif;
+  font-size: 2.6mm;
+  font-weight: 600;
+  letter-spacing: .12em;
+  opacity: .85;
+}
 
 /* ===========================================================
    CONDICIONES (tarjeta) + PIE
