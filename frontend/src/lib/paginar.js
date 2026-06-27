@@ -4,6 +4,6 @@
 // devuelve estructura. Sin React, sin DOM.
 
 // Reparte los bloques en hojas. (Implementacion completa en Task 2.)
-export function paginarBloques(bloques, altoUtilPrimera, altoUtilSiguientes) {
+export function paginarBloques(_bloques, _altoUtilPrimera, _altoUtilSiguientes) {
   return []
 }
