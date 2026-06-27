@@ -41,7 +41,7 @@ function HojaA4({ brand, lang, empresa, t, bloques, esPrimera, esUltima, metaEve
 
       {/* Cabecera de tabla (columnas) — referencia repetida en cada hoja.
           En modo sin IVA solo se muestra la columna Concepto. */}
-      <table className="lineas hoja-lineas">
+      <table className={`lineas hoja-lineas${soloConcepto ? ' solo-concepto' : ''}`}>
         <thead>
           <tr>
             <th>{t.concepto}</th>

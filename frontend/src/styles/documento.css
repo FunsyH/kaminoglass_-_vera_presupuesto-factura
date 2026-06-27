@@ -449,6 +449,10 @@
 /* La cabecera de tabla y las filas ocupan su alto natural; el total se va al
    fondo (margin-top:auto) y el footer cierra debajo. */
 .documento .hoja-a4 .hoja-lineas { width: 100%; }
+/* Modo sin IVA: solo la columna Concepto. Acotamos el ancho de la tabla
+   (a la izquierda) para que no quede un gran vacío a la derecha, sin romper
+   la alineación ni la legibilidad de la lista. */
+.documento .hoja-a4 .hoja-lineas.solo-concepto { width: 115mm; }
 /* En hojas 2+ la tabla va justo tras la cabecera de marca (sin meta-evento en
    medio). El selector adyacente .head + .hoja-lineas solo matchea ese caso y
    le da aire, para que la cabecera de columnas no quede pegada al logo/datos. */
