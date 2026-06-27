@@ -192,8 +192,7 @@
   background: var(--soft);
 }
 
-/* Tabla de líneas de cada sección (.lineas). Acotado para NO afectar a la
-   tabla maestra .doc-table (que también tiene thead/tbody/tfoot). */
+/* Tabla de líneas de cada sección/hoja (.lineas, .hoja-lineas). */
 .documento .lineas { width: 100%; border-collapse: collapse; }
 .documento .lineas thead th {
   font-size: 2.7mm;
@@ -410,56 +409,6 @@
   z-index: 1;
 }
 
-/* ===========================================================
-   TABLA MAESTRA (página 1) — cabecera/pie repetidos por hoja
-   ---
-   El truco: thead -> table-header-group y tfoot -> table-footer-group hacen
-   que el navegador REPITA la cabecera y el pie en cada hoja al imprimir,
-   de forma nativa. El contenido va en tbody y fluye.
-   =========================================================== */
-.documento .doc-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.documento .doc-table > thead { display: table-header-group; }
-.documento .doc-table > tfoot { display: table-footer-group; }
-/* La cabecera de marca lleva su separación inferior; el pie, superior. */
-.documento .doc-table > thead .head { margin-bottom: 2mm; }
-/* El espaciador del tfoot hereda de .foot (mismo alto) pero sin margin:auto
-   (no aplica en celda de tabla) y con una separación superior fija. */
-.documento .doc-table > tfoot .foot-espaciador { margin-top: 4mm; }
-
-/* En PANTALLA, la tabla maestra (página 1) parece una hoja A4 como .page. */
-@media screen {
-  .documento .doc-table {
-    display: block;
-    width: var(--page-w);
-    min-height: 297mm;
-    margin: 0 auto 8mm;
-    padding: 18mm;
-    padding-left: 23mm;
-    background-image: linear-gradient(
-      to right, var(--accent) 0, var(--accent) 5mm, var(--bg) 5mm, var(--bg) 100%
-    );
-    box-shadow: 0 6px 30px rgba(0,0,0,.18);
-  }
-  /* La tabla maestra en pantalla es una columna flex: el cuerpo crece y
-     empuja el pie al fondo de la hoja, haya pocos o muchos ítems. */
-  .documento .doc-table { display: flex; flex-direction: column; }
-  .documento .doc-table > thead,
-  .documento .doc-table > tfoot,
-  .documento .doc-table > thead > tr,
-  .documento .doc-table > tfoot > tr,
-  .documento .doc-table > tbody > tr,
-  .documento .doc-table > thead > tr > td,
-  .documento .doc-table > tfoot > tr > td,
-  .documento .doc-table > tbody > tr > td {
-    display: block;
-  }
-  .documento .doc-table > tbody { display: block; flex: 1; }   /* el cuerpo ocupa el alto disponible */
-  .documento .doc-table > tfoot { margin-top: auto; }          /* el pie, al fondo */
-}
-
 .documento .nota-aceptacion {
   margin-top: 6mm;
   font-size: 2.6mm;
@@ -467,109 +416,50 @@
   text-align: center;
 }
 
-/* En pantalla: .documento es el ancestro posicionado de referencia para
-   .marca-agua (position:absolute). Además el pie fijo se ancla al fondo de la
-   primera hoja A4 como referencia visual (en impresión se repite en cada hoja).
-   Los espaciadores del pie no deben ocupar hueco visible en pantalla. */
-@media screen {
-  .documento { position: relative; }
-  .documento .foot-fijo {
-    position: absolute;
-    left: 23mm; right: 18mm;
-    top: calc(297mm - 18mm);   /* cerca del fondo de la 1ª hoja A4 */
-  }
-  .documento .foot-espaciador,
-  .documento .foot-espaciador-pagina { display: none; }
-}
-
 /* ===========================================================
-   IMPRESIÓN / PDF
-   ---
-   El @page reserva 12mm arriba y 20mm abajo en CADA hoja. La cabecera se
-   repite vía thead (table-header-group). El pie es un footer position:fixed
-   (.foot-fijo) anclado al fondo de cada hoja física dentro del margen inferior
-   de @page, así queda SIEMPRE pegado abajo. El <tfoot> y un espaciador en la
-   página 2 reservan ese hueco (invisibles) para que el contenido no lo invada.
+   HOJA A4 PAGINADA — alto fijo, identica en pantalla y PDF
    =========================================================== */
-@page { size: A4; margin: 12mm 0 20mm 0; }
+.documento .hoja-a4 {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto 8mm;
+  padding: 18mm;
+  padding-left: 23mm;            /* hueco para el filete de acento */
+  background-image: linear-gradient(
+    to right, var(--accent) 0, var(--accent) 5mm, var(--bg) 5mm, var(--bg) 100%
+  );
+  box-shadow: 0 6px 30px rgba(0,0,0,.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* La cabecera de tabla y las filas ocupan su alto natural; el total se va al
+   fondo (margin-top:auto) y el footer cierra debajo. */
+.documento .hoja-a4 .hoja-lineas { width: 100%; }
+/* En la ULTIMA hoja: el total se va al fondo (margin-top:auto) y el footer
+   queda justo debajo. En hojas INTERMEDIAS no hay total, asi que es el footer
+   quien toma margin-top:auto y baja al fondo. Ambos casos cubiertos abajo. */
+.documento .hoja-a4 .hoja-total { margin-top: auto; }
+.documento .hoja-a4 .hoja-foot { margin-top: 3mm; }
+.documento .hoja-a4 > .hoja-foot:last-child { margin-top: auto; }
+.documento .hoja-a4 .fila-titulo td { padding-top: 4mm; }
 
 @media print {
-  /* Oculta toda la interfaz; solo se imprime el documento. */
   .no-print { display: none !important; }
-
-  /* Neutraliza el layout de la app (flex + scroll) para que el documento
-     no quede recortado a la altura de pantalla al imprimir. */
   html, body, #root { height: auto !important; overflow: visible !important; }
   .app-layout { display: block !important; }
-  .zona-documento {
-    height: auto !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    display: block !important;
-  }
-  /* La tabla maestra vuelve a comportarse como tabla normal en impresión. */
-  .documento .doc-table { display: table; width: 100%; }
-  .documento .doc-table > thead { display: table-header-group; }
-  .documento .doc-table > tbody { display: table-row-group; }
+  .zona-documento { height: auto !important; overflow: visible !important; padding: 0 !important; display: block !important; }
 
-  /* El contenido respeta 18mm laterales; el vertical lo da @page. */
-  .documento .doc-table > thead > tr > td,
-  .documento .doc-table > tbody > tr > td,
-  .documento .doc-table > tfoot > tr > td {
-    padding: 0 18mm;
-  }
+  /* Cada hoja A4 ocupa exactamente una pagina fisica. */
+  .documento .hoja-a4 { margin: 0; box-shadow: none; break-after: page; }
+  .documento .hoja-a4:last-of-type { break-after: auto; }
 
-  /* La página 2 (condiciones) empieza en hoja nueva. */
-  .documento .page {
-    margin: 0; box-shadow: none; min-height: 0;
-    padding: 0 18mm;
-    background-image: none;
-    display: block;
-  }
+  /* La pagina 2 de condiciones empieza en hoja nueva. */
   .documento .pagina-condiciones { break-before: page; }
 
-  /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
-  .documento::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0;
-    width: 5mm; height: 100%;
-    background: var(--accent);
-  }
-
-  /* Marca de agua: fija respecto a la hoja física, centrada, en cada página. */
-  .documento .marca-agua {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  /* --- PIE DE PÁGINA VISIBLE: anclado al fondo de CADA hoja física ---
-     Vive dentro del margen inferior de 20mm que reserva @page, así nunca
-     tapa contenido (el contenido no entra en ese margen) y queda siempre
-     pegado abajo, haya mucho o poco contenido en la hoja. */
-  .documento .foot-fijo {
-    position: fixed;
-    left: 23mm; right: 18mm;   /* 18mm + 5mm del filete de acento a la izquierda */
-    bottom: 6mm;               /* dentro del margen inferior reservado por @page */
-    margin: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 3mm;
-    border-top: .3mm solid var(--soft);
-    background: transparent;
-  }
-
-  /* El <tfoot> y el espaciador de la página 2 reservan el hueco del pie pero
-     NO se ven: el pie visible es el .foot-fijo de arriba. Sin esto, el
-     contenido llegaría al borde y el pie fixed lo taparía. */
-  .documento .foot-espaciador { visibility: hidden; }
-  .documento .foot-espaciador-pagina { height: 16mm; }
-
-  /* Reglas de paginación: no partir filas de líneas/cláusulas. */
+  /* No partir filas ni clausulas. */
   .documento .lineas tr, .documento .clause { break-inside: avoid; }
-  .documento .section-title { break-after: avoid; }
-  .documento .totals { break-inside: avoid; }
-  .documento .terms { break-inside: avoid; }
 }
+
+@page { size: A4; margin: 0; }
