@@ -67,7 +67,7 @@ function ControlTotales({ quote, setQuote }) {
       {/* Vista rápida del desglose. En modo sin IVA solo se muestra el TOTAL. */}
       <div className="text-sm text-gray-600 bg-gray-50 rounded p-2">
         {sinIva ? (
-          <div className="text-kng-ink">TOTAL: <b>{formatEuro(total)}</b> <span className="text-gray-500">SIN IVA</span></div>
+          <div className="text-kng-ink">TOTAL: <b>{formatEuro(total)}</b> <span className="text-gray-500">(SIN IVA)</span></div>
         ) : (
           <>
             <div>Base imponible: <b>{formatEuro(base)}</b></div>

@@ -5,6 +5,9 @@ import { importeLinea, subtotalSeccion } from '../../lib/calculos'
 // solo en la primera; cabecera de tabla siempre (referencia de columnas);
 // los bloques de esta hoja; y en la ultima, el total clavado al fondo + footer.
 function HojaA4({ brand, lang, empresa, t, bloques, esPrimera, esUltima, metaEvento, totales }) {
+  // En modo "Total a mano (sin IVA)" no hay desglose por línea: se muestra solo
+  // la columna Concepto (sin Cantidad, Precio unitario ni Importe).
+  const soloConcepto = Boolean(totales.sinIva)
   return (
     <div className="hoja-a4" data-brand={brand} data-lang={lang}>
       <MarcaDeAgua brand={brand} />
@@ -36,18 +39,23 @@ function HojaA4({ brand, lang, empresa, t, bloques, esPrimera, esUltima, metaEve
         </>
       ) : null}
 
-      {/* Cabecera de tabla (columnas) — referencia repetida en cada hoja */}
+      {/* Cabecera de tabla (columnas) — referencia repetida en cada hoja.
+          En modo sin IVA solo se muestra la columna Concepto. */}
       <table className="lineas hoja-lineas">
         <thead>
           <tr>
             <th>{t.concepto}</th>
-            <th className="qty">{t.cant}</th>
-            <th className="num unit">{t.precioUnit}</th>
-            <th className="num amt">{t.importe}</th>
+            {soloConcepto ? null : (
+              <>
+                <th className="qty">{t.cant}</th>
+                <th className="num unit">{t.precioUnit}</th>
+                <th className="num amt">{t.importe}</th>
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
-          {bloques.map((b, i) => <FilaBloque key={i} bloque={b} t={t} />)}
+          {bloques.map((b, i) => <FilaBloque key={i} bloque={b} t={t} soloConcepto={soloConcepto} />)}
         </tbody>
       </table>
 
@@ -69,7 +77,7 @@ function HojaA4({ brand, lang, empresa, t, bloques, esPrimera, esUltima, metaEve
             <div className="totals-row grand">
               <span className="label">
                 {t.total}
-                {totales.sinIva ? <span className="total-sin-iva"> · SIN IVA</span> : null}
+                {totales.sinIva ? <span className="total-sin-iva"> (SIN IVA)</span> : null}
               </span>
               <span className="value">{formatEuro(totales.total)}</span>
             </div>
@@ -87,12 +95,13 @@ function HojaA4({ brand, lang, empresa, t, bloques, esPrimera, esUltima, metaEve
 }
 
 // Pinta un bloque segun su tipo (titulo de seccion, fila de item, subtotal).
-function FilaBloque({ bloque, t }) {
+// soloConcepto=true (modo sin IVA): se omiten las columnas Cant/P.Unit/Importe.
+function FilaBloque({ bloque, t, soloConcepto }) {
   const { tipo, ref } = bloque
   if (tipo === 'titulo') {
     return (
       <tr className="fila-titulo" data-tipo="titulo">
-        <td colSpan={4}>
+        <td colSpan={soloConcepto ? 1 : 4}>
           <div className="section-title">
             <h3>{ref.section.title}</h3>
             <div className="rule" />
@@ -105,9 +114,13 @@ function FilaBloque({ bloque, t }) {
     return (
       <tr className="subtotal" data-tipo="subtotal">
         <td>{t.baseImponible}</td>
-        <td className="qty" />
-        <td className="num unit" />
-        <td className="num amt">{formatEuro(subtotalSeccion(ref.section))}</td>
+        {soloConcepto ? null : (
+          <>
+            <td className="qty" />
+            <td className="num unit" />
+            <td className="num amt">{formatEuro(subtotalSeccion(ref.section))}</td>
+          </>
+        )}
       </tr>
     )
   }
@@ -120,9 +133,13 @@ function FilaBloque({ bloque, t }) {
         <div className="desc-main">{item.description}</div>
         {item.note ? <div className="desc-note">{item.note}</div> : null}
       </td>
-      <td className="qty">{item.qty ?? ''}</td>
-      <td className="num unit">{tienePrecio ? formatEuro(item.unitPrice) : ''}</td>
-      <td className="num amt">{tienePrecio ? formatEuro(importeLinea(item)) : ''}</td>
+      {soloConcepto ? null : (
+        <>
+          <td className="qty">{item.qty ?? ''}</td>
+          <td className="num unit">{tienePrecio ? formatEuro(item.unitPrice) : ''}</td>
+          <td className="num amt">{tienePrecio ? formatEuro(importeLinea(item)) : ''}</td>
+        </>
+      )}
     </tr>
   )
 }
