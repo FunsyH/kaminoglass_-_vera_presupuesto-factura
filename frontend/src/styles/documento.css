@@ -46,14 +46,18 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Tokens activos según marca (se reasignan con [data-brand]) */
+/* Tokens activos según marca (se reasignan con [data-brand]).
+   --total-text = color del texto sobre el cuadro de TOTAL (su fondo es --accent):
+   KNG dorado claro -> texto oscuro; VERA azul oscuro -> texto blanco. */
 .documento[data-brand="kng"] {
   --ink: var(--kng-ink); --accent: var(--kng-gold); --accent-d: var(--kng-gold-d);
   --bg: var(--kng-cream); --paper: var(--kng-paper); --soft: var(--kng-soft); --muted: var(--kng-muted);
+  --total-text: var(--kng-ink);
 }
 .documento[data-brand="vera"] {
   --ink: var(--vera-ink); --accent: var(--vera-blue); --accent-d: var(--vera-blue-d);
   --bg: var(--vera-bone); --paper: var(--vera-paper); --soft: var(--vera-soft); --muted: var(--vera-muted);
+  --total-text: #fff;
 }
 
 .documento .display { font-family: "utopia-std-headline", "Georgia", serif; }
@@ -254,10 +258,10 @@
   margin-top: 0.55mm;        /* mitad del espacio anterior (IVA <-> cuadro) */
   padding: 1.5mm 4mm;        /* mitad del padding vertical (linea <-> TOTAL) */
   background: var(--accent);
-  color: var(--ink);         /* tinta oscura sobre dorado: maxima legibilidad y look premium */
+  color: var(--total-text);  /* se adapta a la marca: oscuro en KNG, blanco en VERA */
   border-radius: 1mm;
 }
-.documento .totals-row.grand span { color: var(--ink); }
+.documento .totals-row.grand span { color: var(--total-text); }
 .documento .totals-row.grand .label {
   font-family: "utopia-std-headline", serif;
   font-size: 4.4mm;
