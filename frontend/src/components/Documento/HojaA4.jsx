@@ -83,7 +83,7 @@ function FilaBloque({ bloque, t }) {
   const { tipo, ref } = bloque
   if (tipo === 'titulo') {
     return (
-      <tr className="fila-titulo">
+      <tr className="fila-titulo" data-tipo="titulo">
         <td colSpan={4}>
           <div className="section-title">
             <h3>{ref.section.title}</h3>
@@ -95,7 +95,7 @@ function FilaBloque({ bloque, t }) {
   }
   if (tipo === 'subtotal') {
     return (
-      <tr className="subtotal">
+      <tr className="subtotal" data-tipo="subtotal">
         <td>{t.baseImponible}</td>
         <td className="qty" />
         <td className="num unit" />
@@ -107,7 +107,7 @@ function FilaBloque({ bloque, t }) {
   const item = ref.item
   const tienePrecio = typeof item.unitPrice === 'number'
   return (
-    <tr>
+    <tr data-tipo="item">
       <td>
         <div className="desc-main">{item.description}</div>
         {item.note ? <div className="desc-note">{item.note}</div> : null}

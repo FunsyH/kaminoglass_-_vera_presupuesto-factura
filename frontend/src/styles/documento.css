@@ -370,14 +370,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: -1;           /* SIEMPRE detrás del contenido (incluso al imprimir) */
+  z-index: 0;            /* sobre el fondo de la hoja, detrás del contenido (z-index:1) */
   pointer-events: none;
   user-select: none;
-}
-/* En pantalla la centramos en la primera hoja (referencia visual); lo que
-   importa de verdad es la impresión, donde se fija a cada hoja (más abajo). */
-@media screen {
-  .documento .marca-agua { top: 148mm; } /* ~mitad de una A4 */
 }
 /* KNG: el círculo Enzo, grande y muy tenue */
 .documento .marca-agua-kng {
@@ -395,7 +390,7 @@
   white-space: nowrap;
 }
 
-/* El contenido de la página va por encima de la marca de agua. */
+/* El contenido de la página va por encima de la marca de agua (z-index:0). */
 .documento .head,
 .documento .doc-meta,
 .documento .event-sub,
@@ -404,13 +399,19 @@
 .documento .terms,
 .documento .terms-head,
 .documento .clauses,
-.documento .foot {
+.documento .foot,
+.documento .hoja-lineas,
+.documento .hoja-total,
+.documento .hoja-foot {
   position: relative;
   z-index: 1;
 }
 
 .documento .nota-aceptacion {
-  margin-top: 6mm;
+  /* Absorbe el espacio sobrante entre las cláusulas y el footer, centrándose
+     en él, en vez de dejar un vacío grande pegado abajo. */
+  margin: auto 0;
+  padding: 6mm 0;
   font-size: 2.6mm;
   color: var(--muted);
   text-align: center;
@@ -446,6 +447,13 @@
 .documento .hoja-a4 .fila-titulo td { padding-top: 4mm; }
 /* El pie propio de la página 2 (condiciones) baja al fondo de su hoja. */
 .documento .pagina-condiciones > .hoja-foot { margin-top: auto; }
+
+/* Zona de medición: la HojaA4 que se mide debe tener alto NATURAL (no fijo) y
+   sin recorte, para que cada elemento mida su alto real. El total no se ancla
+   al fondo aquí (margin-top:0) para medir su alto intrínseco. */
+.zona-medicion .hoja-a4 { height: auto; overflow: visible; }
+.zona-medicion .hoja-a4 .hoja-total,
+.zona-medicion .hoja-a4 > .hoja-foot:last-child { margin-top: 0; }
 
 @media print {
   .no-print { display: none !important; }

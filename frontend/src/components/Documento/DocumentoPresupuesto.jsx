@@ -62,8 +62,8 @@ function DocumentoPresupuesto({ quote }) {
 
   return (
     <div className="documento" data-brand={quote.brand} data-lang={quote.lang}>
-      {/* Contenedor invisible de medicion (Task 3 lo lee por data-attrs) */}
-      <ContenedorMedicion refMedicion={refMedicion} quote={quote} empresa={empresa} t={t} bloques={bloquesBase} />
+      {/* Contenedor invisible de medicion: HojaA4 real medida por el hook. */}
+      <ContenedorMedicion refMedicion={refMedicion} quote={quote} empresa={empresa} t={t} bloques={bloquesBase} totales={totales} />
 
       {!listo || !hojas ? (
         // Hoja provisional mientras se mide (evita parpadeo)
@@ -82,39 +82,26 @@ function DocumentoPresupuesto({ quote }) {
   )
 }
 
-// Render invisible para medir: cada bloque lleva data-medir/data-tipo; los
-// elementos fijos llevan data-fijo. position:absolute + visibility:hidden para
-// que no se vea ni ocupe sitio en el layout real.
-function ContenedorMedicion({ refMedicion, quote, empresa, t, bloques }) {
+// Render invisible para medir con el MARKUP REAL. Renderiza una HojaA4 idéntica
+// a la pintada (misma cabecera, mismas filas via FilaBloque, mismo total) dentro
+// de un contenedor del ancho real de una hoja A4 (210mm). Así las alturas medidas
+// COINCIDEN con las pintadas y la paginación corta donde debe.
+//
+// El hook lee:
+//  - cada fila real .hoja-lineas tbody tr  -> alto de cada bloque (en orden)
+//  - .head -> cabecera de marca; thead.hoja-thead -> cabecera de tabla
+//  - .doc-meta -> meta del evento; .hoja-total -> bloque de total
+function ContenedorMedicion({ refMedicion, quote, empresa, t, bloques, totales }) {
   return (
-    <div ref={refMedicion} aria-hidden="true"
+    <div ref={refMedicion} aria-hidden="true" className="zona-medicion"
       style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none',
-        width: '174mm', left: '-9999px', top: 0 }}>
+        left: '-9999px', top: 0 }}>
       <div className="documento" data-brand={quote.brand} data-lang={quote.lang}>
-        <div data-fijo="cabeceraMarca" className="head">{empresa.nombre}</div>
-        <div data-fijo="metaEvento" className="doc-meta">{quote.event.title}</div>
-        <table className="lineas"><thead data-fijo="cabeceraTabla"><tr>
-          <th>{t.concepto}</th><th>{t.cant}</th><th>{t.precioUnit}</th><th>{t.importe}</th>
-        </tr></thead><tbody>
-          {bloques.map((b, i) => (
-            <tr key={i} data-medir={i} data-tipo={b.tipo}>
-              <td colSpan={4}>{rotuloMedicion(b)}</td>
-            </tr>
-          ))}
-        </tbody></table>
-        <div data-fijo="totalFooter" className="totals">{t.total}</div>
+        <HojaA4 brand={quote.brand} lang={quote.lang} empresa={empresa} t={t}
+          bloques={bloques} esPrimera esUltima metaEvento={quote.event} totales={totales} />
       </div>
     </div>
   )
-}
-
-// Texto representativo para medir el alto de cada bloque (mismo contenido real
-// que determina su altura: descripcion + nota para items).
-function rotuloMedicion(b) {
-  if (b.tipo === 'titulo') return b.ref.section.title
-  if (b.tipo === 'subtotal') return 'subtotal'
-  const item = b.ref.item
-  return item.note ? `${item.description} ${item.note}` : item.description
 }
 
 export default DocumentoPresupuesto
