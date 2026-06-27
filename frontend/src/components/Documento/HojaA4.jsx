@@ -77,7 +77,7 @@ function HojaA4({ brand, lang, empresa, t, bloques, esPrimera, esUltima, metaEve
             <div className="totals-row grand">
               <span className="label">
                 {t.total}
-                {totales.sinIva ? <span className="total-sin-iva"> (SIN IVA)</span> : null}
+                {totales.sinIva ? <span className="total-sin-iva"> {t.sinIvaLabel}</span> : null}
               </span>
               <span className="value">{formatEuro(totales.total)}</span>
             </div>
