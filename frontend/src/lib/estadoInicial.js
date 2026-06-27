@@ -24,49 +24,39 @@ export function crearSeccionVacia(id) {
   return { id: seccionId, title: '', showSubtotal: false, items: [crearItemVacio()] };
 }
 
-// Devuelve el presupuesto de ejemplo "Roca Lisa · 40 pax".
-// Sirve para que la app arranque mostrando datos realistas en vez de un formulario vacío.
-//
-// Comprobación mental del cálculo (modo 'auto', IVA 21 %):
-//   base  = 245 + 220 + 200 + 260 + 200 + 50 + 250 = 1425
-//   iva   = 1425 * 0.21 = 299.25
-//   total = 1425 + 299.25 = 1724.25
-// Por tanto calcularTotales(crearQuoteInicial()) -> { base: 1425, iva: 299.25, total: 1724.25 }.
+// Fecha de hoy en formato español dd/mm/aaaa (para la fecha de emisión).
+function fechaHoy() {
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
+// Número de presupuesto inicial SUGERIDO. Es editable a mano en el formulario.
+// TODO: cuando definas la numeración real (ya habéis emitido varios), cambia
+// este valor por el siguiente que toque. Cuando haya base de datos, este número
+// pasará a ser un contador automático compartido.
+const NUMERO_INICIAL = 'KNG-2026-0055';
+
+// Devuelve un presupuesto VACÍO listo para rellenar (campos en blanco; el
+// formulario muestra ejemplos como placeholder gris). Arranca con 2 secciones
+// vacías (estructura tipo Staff / Material) y la fecha de emisión = hoy.
 export function crearQuoteInicial() {
   return {
     brand: 'kng',
     lang: 'es',
     event: {
-      title: 'Roca Lisa · 40 pax',
-      dateText: '20 de junio, 2026',
-      place: 'Roca Lisa, Ibiza',
-      serviceText: '4 h de servicio + 3 h montaje y limpieza',
-      docNumber: 'KNG-2026-0042',
-      issueDate: '20/06/2026',
+      title: '',
+      dateText: '',
+      place: '',
+      serviceText: '',
+      docNumber: NUMERO_INICIAL,
+      issueDate: fechaHoy(),
       validityDays: '15',
     },
     sections: [
-      {
-        id: 's1',
-        title: 'Personal',
-        showSubtotal: false,
-        items: [
-          { description: 'Bartender', note: '4 h servicio + 3 h montaje/cierre', qty: 1, unitPrice: 245 },
-          { description: 'Camarero', qty: 1, unitPrice: 220 },
-          { description: 'Personal de limpieza', qty: 1, unitPrice: 200 },
-        ],
-      },
-      {
-        id: 's2',
-        title: 'Alquiler de material',
-        showSubtotal: false,
-        items: [
-          { description: 'Barra pequeña con backbar', qty: 1, unitPrice: 260 },
-          { description: 'Cristalería', note: 'Cristal', qty: 1, unitPrice: 200 },
-          { description: 'Equipamiento para cócteles', qty: 1, unitPrice: 50 },
-          { description: 'Transporte y recogida', qty: 1, unitPrice: 250 },
-        ],
-      },
+      { id: 's1', title: '', showSubtotal: false, items: [crearItemVacio()] },
+      { id: 's2', title: '', showSubtotal: false, items: [crearItemVacio()] },
     ],
     totalMode: 'auto',
     manualTotal: null,
