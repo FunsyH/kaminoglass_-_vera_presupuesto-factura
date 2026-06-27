@@ -439,6 +439,10 @@
 /* La cabecera de tabla y las filas ocupan su alto natural; el total se va al
    fondo (margin-top:auto) y el footer cierra debajo. */
 .documento .hoja-a4 .hoja-lineas { width: 100%; }
+/* En hojas 2+ la tabla va justo tras la cabecera de marca (sin meta-evento en
+   medio). El selector adyacente .head + .hoja-lineas solo matchea ese caso y
+   le da aire, para que la cabecera de columnas no quede pegada al logo/datos. */
+.documento .hoja-a4 .head + .hoja-lineas { margin-top: 7mm; }
 /* En la ULTIMA hoja: el total se va al fondo (margin-top:auto) y el footer
    queda justo debajo. En hojas INTERMEDIAS no hay total, asi que es el footer
    quien toma margin-top:auto y baja al fondo. Ambos casos cubiertos abajo. */
@@ -467,8 +471,13 @@
   .documento .hoja-a4:last-of-type { break-after: auto; }
 
   /* La pagina 2 de condiciones empieza en hoja nueva, con el mismo reset
-     de margen/sombra que las hojas A4 (consistencia entre paginas impresas). */
-  .documento .pagina-condiciones { margin: 0; box-shadow: none; break-before: page; }
+     de margen/sombra que las hojas A4 (consistencia entre paginas impresas).
+     ALTO FIJO 297mm tambien en impresion: si no, al imprimir solo ocupa el
+     alto del contenido y queda blanco abajo (en pantalla si tiene min-height). */
+  .documento .pagina-condiciones {
+    margin: 0; box-shadow: none; break-before: page;
+    height: 297mm;
+  }
 
   /* No partir filas ni clausulas. */
   .documento .lineas tr, .documento .clause { break-inside: avoid; }
