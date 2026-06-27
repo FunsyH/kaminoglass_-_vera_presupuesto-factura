@@ -1,0 +1,13 @@
+# Configuración de Netlify.
+# La app vive en la subcarpeta frontend/, así que el build se hace ahí
+# y se publica frontend/dist (la salida de Vite).
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+# SPA: cualquier ruta sirve index.html (la app maneja el enrutado en cliente).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
