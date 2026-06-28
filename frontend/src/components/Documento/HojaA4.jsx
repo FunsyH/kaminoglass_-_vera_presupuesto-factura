@@ -151,10 +151,7 @@ function CabeceraMarca({ empresa, brand }) {
         {brand === 'kng' ? (
           <img className="logo-kng" src="/assets/logo-kng.png" alt="Kami No Glass" />
         ) : (
-          <div className="logo-vera">
-            <div className="wordmark">VERA</div>
-            <div className="tag">Equipment &amp; Rentals</div>
-          </div>
+          <img className="logo-vera-img" src="/assets/logo-vera.png" alt="VERA" />
         )}
       </div>
       <div className="company">

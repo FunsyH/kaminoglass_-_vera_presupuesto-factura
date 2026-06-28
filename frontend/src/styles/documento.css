@@ -101,6 +101,8 @@
 }
 
 .documento .logo-kng { width: 24mm; height: auto; display: block; }
+/* Logo VERA (imagen). Es horizontal, así que va más ancho que el de KNG. */
+.documento .logo-vera-img { width: 52mm; height: auto; display: block; }
 
 .documento .logo-vera .wordmark {
   font-family: "utopia-std-headline", serif;
