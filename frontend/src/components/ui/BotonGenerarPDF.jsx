@@ -1,9 +1,15 @@
+import { confirmarNumeroPresupuestoUsado, siguienteNumeroPresupuesto } from '../../lib/estadoInicial'
+
 // Botón que genera el PDF usando la impresión del navegador.
-// Al imprimir, el CSS oculta la interfaz (.no-print) y deja solo el documento.
-function BotonGenerarPDF() {
+// Al imprimir: guarda el número usado para que la siguiente sugerencia
+// avance automáticamente, y actualiza el campo docNumber en el formulario.
+function BotonGenerarPDF({ quote, setQuote }) {
   function generar() {
-    // window.print() abre el diálogo de impresión del navegador.
-    // El usuario elige "Guardar como PDF". El CSS @media print hace el resto.
+    const { brand, event } = quote
+    confirmarNumeroPresupuestoUsado(brand, event.docNumber)
+    // Actualiza el formulario con el siguiente número para el próximo presupuesto.
+    const siguiente = siguienteNumeroPresupuesto(brand, event.docNumber)
+    setQuote((q) => ({ ...q, event: { ...q.event, docNumber: siguiente } }))
     window.print()
   }
 

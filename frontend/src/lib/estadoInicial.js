@@ -33,13 +33,40 @@ export function fechaHoy() {
 }
 
 // Número siguiente sugerido por marca. Editable a mano en el formulario.
+// Cuando haya base de datos, estos valores arrancarán desde el último guardado.
 const NUMEROS_INICIALES = {
   kng:  'KNG-2026-0039',
   vera: 'VERA-2026-0015',
 };
 
+const PREFIJOS_PRESUPUESTO = { kng: 'KNG', vera: 'VERA' };
+
+// Devuelve el número guardado en localStorage para esta marca,
+// o el inicial hardcodeado si nunca se ha generado ninguno.
 export function numeroInicialPara(brand) {
+  const guardado = localStorage.getItem(`presupuesto-ultimo-${brand}`);
+  if (guardado) {
+    // El guardado es el ÚLTIMO USADO; devolvemos el siguiente.
+    return siguienteNumeroPresupuesto(brand, guardado);
+  }
   return NUMEROS_INICIALES[brand] || NUMEROS_INICIALES.kng;
+}
+
+// Dado el número actual (ej. "KNG-2026-0039"), devuelve el siguiente
+// ("KNG-2026-0040"). Mantiene el año y el padding de 4 cifras.
+export function siguienteNumeroPresupuesto(brand, actual) {
+  const match = actual.match(/(\d{4})-(\d+)$/);
+  if (!match) return actual; // formato inesperado -> no tocamos nada
+  const anio = match[1];
+  const siguiente = Number(match[2]) + 1;
+  const prefijo = PREFIJOS_PRESUPUESTO[brand] || brand.toUpperCase();
+  return `${prefijo}-${anio}-${String(siguiente).padStart(4, '0')}`;
+}
+
+// Persiste el número que se acaba de usar, para que la próxima sugerencia
+// avance. Solo se llama al generar el PDF, no en cada render.
+export function confirmarNumeroPresupuestoUsado(brand, docNumber) {
+  localStorage.setItem(`presupuesto-ultimo-${brand}`, docNumber);
 }
 
 // Devuelve un presupuesto VACÍO listo para rellenar (campos en blanco; el

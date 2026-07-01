@@ -17,7 +17,7 @@ function FormularioPresupuesto({ quote, setQuote }) {
       <DatosEvento quote={quote} setQuote={setQuote} />
       <EditorSecciones quote={quote} setQuote={setQuote} />
       <ControlTotales quote={quote} setQuote={setQuote} />
-      <BotonGenerarPDF />
+      <BotonGenerarPDF quote={quote} setQuote={setQuote} />
     </div>
   )
 }
