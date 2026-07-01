@@ -20,6 +20,10 @@ export const datosEmpresa = {
       nombre: 'Kami No Glass Group SL',
       cifLabel: 'CIF',
       cif: 'B70721816',
+      direccion: 'Avenida de Europa 14 portal 6 3ºa',
+      ciudad: 'Pozuelo de Alarcón (MADRID) 28.223',
+      iban: 'ES65 0049 4973 5928 1698 3657',
+      nombreCuenta: 'KAMI NO GLASS GROUP SL',
       contacto: [
         'info@kng-group.com',
         '+34 671 821 215 · Adrián',
@@ -54,6 +58,10 @@ export const datosEmpresa = {
       nombre: 'Venue Equipment & Rental Accessories SL',
       cifLabel: 'CIF',
       cif: 'B21655550',
+      direccion: 'Avenida de Europa 14 portal 6 3ºa',
+      ciudad: 'Pozuelo de Alarcón (MADRID) 28.223',
+      iban: 'ES89 0049 4973 5422 1702 4599',
+      nombreCuenta: 'Venue Equipment & Rental Accessories SL',
       contacto: [
         'verainforental@gmail.com',
         '+34 671 821 215 · Adrián',

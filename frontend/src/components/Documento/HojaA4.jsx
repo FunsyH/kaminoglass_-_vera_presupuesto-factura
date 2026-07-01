@@ -144,7 +144,7 @@ function FilaBloque({ bloque, t, soloConcepto }) {
   )
 }
 
-function CabeceraMarca({ empresa, brand }) {
+export function CabeceraMarca({ empresa, brand }) {
   return (
     <div className="head">
       <div className="brandmark">
@@ -165,11 +165,11 @@ function CabeceraMarca({ empresa, brand }) {
   )
 }
 
-function MarcaDeAgua({ brand }) {
+export function MarcaDeAgua({ brand }) {
   if (brand === 'kng') {
     return <img className="marca-agua marca-agua-kng" src="/assets/logo-kng.png" alt="" aria-hidden="true" />
   }
-  return <div className="marca-agua marca-agua-vera" aria-hidden="true">VERA</div>
+  return <img className="marca-agua marca-agua-vera" src="/assets/logo-vera-watermark.png" alt="" aria-hidden="true" />
 }
 
 export default HojaA4

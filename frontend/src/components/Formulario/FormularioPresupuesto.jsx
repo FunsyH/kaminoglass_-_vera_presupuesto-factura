@@ -8,7 +8,7 @@ import BotonGenerarPDF from '../ui/BotonGenerarPDF'
 // presupuesto. Recibe el quote y la función para actualizarlo desde App.
 function FormularioPresupuesto({ quote, setQuote }) {
   return (
-    <div className="no-print w-[480px] shrink-0 h-screen overflow-y-auto bg-white border-r border-gray-200 p-5">
+    <div className="no-print w-[480px] shrink-0 h-full overflow-y-auto bg-white border-r border-gray-200 p-5">
       <h1 className="text-lg font-semibold text-kng-ink mb-4">
         Presupuestos · KNG &amp; VERA
       </h1>

@@ -245,8 +245,28 @@
   margin-top: 3mm;
   display: flex;
   justify-content: flex-end;   /* bloque de totales a la DERECHA */
+  align-items: flex-end;
+  gap: 8mm;
 }
 .documento .totals-box { width: 92mm; }
+
+/* Metodo de pago (solo Factura): a la izquierda del cuadro de TOTAL,
+   ocupa el espacio que el flex deja libre (justify-content:flex-end). */
+.documento .metodo-pago {
+  flex: 1;
+  font-size: 2.9mm;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.documento .metodo-pago-label {
+  font-size: 2.7mm;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent-d);
+  font-weight: 600;
+  margin-bottom: 1mm;
+}
+.documento .metodo-pago-iban { color: var(--ink); font-weight: 600; }
 .documento .totals-row {
   display: flex;
   justify-content: space-between;
@@ -398,14 +418,11 @@
   height: auto;
   opacity: 0.04;
 }
-/* VERA: el wordmark gigante, tenue, en el azul de marca */
+/* VERA: el logo completo, grande y tenue, igual de discreto que el wordmark anterior */
 .documento .marca-agua-vera {
-  font-family: "utopia-std-headline", serif;
-  font-size: 64mm;
-  letter-spacing: .1em;
-  color: var(--vera-blue);
-  opacity: 0.05;
-  white-space: nowrap;
+  width: 130mm;
+  height: auto;
+  opacity: 0.06;
 }
 
 /* El contenido de la página va por encima de la marca de agua (z-index:0). */

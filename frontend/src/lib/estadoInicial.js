@@ -25,7 +25,7 @@ export function crearSeccionVacia(id) {
 }
 
 // Fecha de hoy en formato español dd/mm/aaaa (para la fecha de emisión).
-function fechaHoy() {
+export function fechaHoy() {
   const d = new Date();
   const dd = String(d.getDate()).padStart(2, '0');
   const mm = String(d.getMonth() + 1).padStart(2, '0');

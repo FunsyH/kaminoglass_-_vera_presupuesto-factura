@@ -148,6 +148,8 @@ export const clausulas = {
 export const etiquetas = {
   es: {
     presupuesto: 'Presupuesto',
+    factura: 'Factura',
+    cif: 'CIF',
     concepto: 'Concepto',
     cant: 'Cant.',
     precioUnit: 'P. unit.',
