@@ -32,11 +32,15 @@ export function fechaHoy() {
   return `${dd}/${mm}/${d.getFullYear()}`;
 }
 
-// Número de presupuesto inicial SUGERIDO. Es editable a mano en el formulario.
-// TODO: cuando definas la numeración real (ya habéis emitido varios), cambia
-// este valor por el siguiente que toque. Cuando haya base de datos, este número
-// pasará a ser un contador automático compartido.
-const NUMERO_INICIAL = 'KNG-2026-0055';
+// Número siguiente sugerido por marca. Editable a mano en el formulario.
+const NUMEROS_INICIALES = {
+  kng:  'KNG-2026-0039',
+  vera: 'VERA-2026-0015',
+};
+
+export function numeroInicialPara(brand) {
+  return NUMEROS_INICIALES[brand] || NUMEROS_INICIALES.kng;
+}
 
 // Devuelve un presupuesto VACÍO listo para rellenar (campos en blanco; el
 // formulario muestra ejemplos como placeholder gris). Arranca con 2 secciones
@@ -50,7 +54,7 @@ export function crearQuoteInicial() {
       dateText: '',
       place: '',
       serviceText: '',
-      docNumber: NUMERO_INICIAL,
+      docNumber: numeroInicialPara('kng'),
       issueDate: fechaHoy(),
       validityDays: '15',
     },
@@ -79,7 +83,7 @@ export function crearQuoteOpenBarLosOlivos() {
       dateText: '16:00 till 03:00am',
       place: 'Villa Los Olivos',
       serviceText: '11 h of service + 4 h closing and set up · Option 1',
-      docNumber: NUMERO_INICIAL,
+      docNumber: numeroInicialPara('kng'),
       issueDate: fechaHoy(),
       validityDays: '15',
     },

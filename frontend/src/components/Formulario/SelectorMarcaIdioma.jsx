@@ -1,20 +1,34 @@
+import { numeroInicialPara } from '../../lib/estadoInicial'
+
 // Botones para elegir la empresa (KNG/VERA) y el idioma (ES/EN).
 // Al pulsar, actualiza el quote en el componente padre.
 function SelectorMarcaIdioma({ quote, setQuote }) {
-  // Cambia una propiedad del quote (brand o lang) sin tocar el resto.
-  function cambiar(campo, valor) {
-    setQuote((q) => ({ ...q, [campo]: valor }))
+  function cambiarLang(valor) {
+    setQuote((q) => ({ ...q, lang: valor }))
+  }
+
+  // Al cambiar de marca: actualiza brand y, si el número no fue editado
+  // a mano (todavía coincide con el sugerido de la marca anterior), lo
+  // sustituye por el sugerido de la marca nueva.
+  function cambiarBrand(nuevaBrand) {
+    setQuote((q) => {
+      const numeroAnterior = numeroInicialPara(q.brand)
+      const docNumber = q.event.docNumber === numeroAnterior
+        ? numeroInicialPara(nuevaBrand)
+        : q.event.docNumber
+      return { ...q, brand: nuevaBrand, event: { ...q.event, docNumber } }
+    })
   }
 
   return (
     <div className="mb-5">
       <Grupo titulo="Empresa">
-        <Boton activo={quote.brand === 'kng'} onClick={() => cambiar('brand', 'kng')}>KNG</Boton>
-        <Boton activo={quote.brand === 'vera'} onClick={() => cambiar('brand', 'vera')}>VERA</Boton>
+        <Boton activo={quote.brand === 'kng'} onClick={() => cambiarBrand('kng')}>KNG</Boton>
+        <Boton activo={quote.brand === 'vera'} onClick={() => cambiarBrand('vera')}>VERA</Boton>
       </Grupo>
       <Grupo titulo="Idioma">
-        <Boton activo={quote.lang === 'es'} onClick={() => cambiar('lang', 'es')}>ES</Boton>
-        <Boton activo={quote.lang === 'en'} onClick={() => cambiar('lang', 'en')}>EN</Boton>
+        <Boton activo={quote.lang === 'es'} onClick={() => cambiarLang('es')}>ES</Boton>
+        <Boton activo={quote.lang === 'en'} onClick={() => cambiarLang('en')}>EN</Boton>
       </Grupo>
     </div>
   )
