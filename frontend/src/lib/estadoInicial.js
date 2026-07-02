@@ -87,7 +87,6 @@ export function crearQuoteInicial() {
     },
     sections: [
       { id: 's1', title: '', showSubtotal: false, items: [crearItemVacio()] },
-      { id: 's2', title: '', showSubtotal: false, items: [crearItemVacio()] },
     ],
     totalMode: 'auto',
     manualTotal: null,
