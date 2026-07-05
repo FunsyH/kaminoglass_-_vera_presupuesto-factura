@@ -1,25 +1,26 @@
-import { confirmarNumeroUsado } from '../../lib/numeracionFactura'
+import { confirmarNumeroUsado, sugerirSiguienteNumero } from '../../lib/numeracionFactura'
 import { guardarCliente } from '../../lib/clientesFrecuentes'
 
-// Extrae el correlativo (la parte numérica) de un docNumber ya formateado,
-// para poder guardarlo como "usado" antes de imprimir. Funciona con los dos
-// formatos: "12/2026" y "K-001/2027".
 function correlativoDe(docNumber) {
   const match = docNumber.match(/(\d+)\/\d{4}$/)
   return match ? Number(match[1]) : null
 }
 
-// Botón que genera el PDF de la factura. Antes de imprimir: guarda el
-// correlativo usado (para que la siguiente factura sugiera el número
-// siguiente) y guarda el cliente en la lista de frecuentes.
-function BotonGenerarPDFFactura({ factura }) {
+function BotonGenerarPDFFactura({ factura, setFactura, onValidar }) {
   function generar() {
+    if (!onValidar?.()) return
+
     const year = new Date(factura.issueDate.split('/').reverse().join('-')).getFullYear()
     const correlativo = correlativoDe(factura.docNumber)
     if (correlativo !== null) {
       confirmarNumeroUsado(factura.brand, year, correlativo)
     }
     guardarCliente(factura.cliente)
+
+    // Avanza el número para la siguiente factura antes de imprimir.
+    const siguiente = sugerirSiguienteNumero(factura.brand, year)
+    setFactura((f) => ({ ...f, docNumber: siguiente }))
+
     window.print()
   }
 
@@ -37,10 +38,7 @@ function BotonGenerarPDFFactura({ factura }) {
         <ul className="mt-1 list-disc pl-4 space-y-0.5">
           <li>Destino: <b>Guardar como PDF</b></li>
           <li>Tamaño: <b>A4</b></li>
-          <li>
-            Desactiva <b>«Encabezados y pies de página»</b> (quita la fecha de arriba
-            y la dirección web de abajo que pone el navegador).
-          </li>
+          <li>Desactiva <b>«Encabezados y pies de página»</b></li>
         </ul>
       </div>
     </div>

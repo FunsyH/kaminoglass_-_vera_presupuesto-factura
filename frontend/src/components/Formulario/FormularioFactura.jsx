@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import SelectorMarcaFactura from './SelectorMarcaFactura'
 import DatosFacturaCabecera from './DatosFacturaCabecera'
 import DatosCliente from './DatosCliente'
@@ -5,10 +6,34 @@ import EditorSecciones from './EditorSecciones'
 import MetodoPago from './MetodoPago'
 import BotonGenerarPDFFactura from '../ui/BotonGenerarPDFFactura'
 
-// Panel de formulario completo de Factura. EditorSecciones se reutiliza tal
-// cual del módulo de Presupuesto: solo lee/escribe `sections`, que tiene la
-// misma forma en ambos estados.
+const CAMPOS_OBLIGATORIOS = ['nombre', 'direccion', 'ciudad', 'cif']
+const ETIQUETAS = { nombre: 'Nombre', direccion: 'Dirección', ciudad: 'Ciudad', cif: 'CIF / NIF' }
+
+function validarCliente(cliente) {
+  const errores = {}
+  for (const campo of CAMPOS_OBLIGATORIOS) {
+    if (!cliente[campo]?.trim()) {
+      errores[campo] = `${ETIQUETAS[campo]} es obligatorio`
+    }
+  }
+  return errores
+}
+
 function FormularioFactura({ factura, setFactura }) {
+  const [errores, setErrores] = useState({})
+
+  function intentarGenerar() {
+    const nuevosErrores = validarCliente(factura.cliente)
+    setErrores(nuevosErrores)
+    return Object.keys(nuevosErrores).length === 0
+  }
+
+  // Limpiar el error de un campo cuando el usuario empieza a rellenarlo.
+  function setFacturaYLimpiarError(actualizador) {
+    setFactura(actualizador)
+    setErrores({})
+  }
+
   return (
     <div className="no-print w-[480px] shrink-0 h-full overflow-y-auto bg-white border-r border-gray-200 p-5">
       <h1 className="text-lg font-semibold text-kng-ink mb-4">
@@ -17,10 +42,14 @@ function FormularioFactura({ factura, setFactura }) {
 
       <SelectorMarcaFactura factura={factura} setFactura={setFactura} />
       <DatosFacturaCabecera factura={factura} setFactura={setFactura} />
-      <DatosCliente factura={factura} setFactura={setFactura} />
+      <DatosCliente
+        factura={factura}
+        setFactura={setFacturaYLimpiarError}
+        errores={errores}
+      />
       <EditorSecciones quote={factura} setQuote={setFactura} />
       <MetodoPago factura={factura} setFactura={setFactura} />
-      <BotonGenerarPDFFactura factura={factura} />
+      <BotonGenerarPDFFactura factura={factura} setFactura={setFactura} onValidar={intentarGenerar} />
     </div>
   )
 }

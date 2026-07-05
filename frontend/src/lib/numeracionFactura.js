@@ -31,6 +31,25 @@ function formatearNumero(brand, year, correlativo) {
   return `${prefijo}-${String(correlativo).padStart(3, '0')}/${year}`
 }
 
+// Números de partida para cada marca. El valor es el último USADO antes de
+// arrancar la app, así que la primera sugerencia será siempre este + 1.
+// Solo se aplica si localStorage no tiene ningún valor previo (es decir,
+// no sobreescribe facturas ya emitidas desde la app).
+const CORRELATIVOS_INICIALES = {
+  kng:  { 2026: 10 },
+  vera: { 2026: 14 },
+}
+
+export function inicializarCorrelativos() {
+  const year = new Date().getFullYear()
+  for (const [brand, porAnio] of Object.entries(CORRELATIVOS_INICIALES)) {
+    const clave = claveCorrelativo(brand, year)
+    if (!localStorage.getItem(clave) && porAnio[year] != null) {
+      localStorage.setItem(clave, String(porAnio[year]))
+    }
+  }
+}
+
 // Devuelve el número que se le sugerirá al usuario para la PRÓXIMA factura
 // de esa marca y año (no consume el número: solo lo propone).
 export function sugerirSiguienteNumero(brand, year) {

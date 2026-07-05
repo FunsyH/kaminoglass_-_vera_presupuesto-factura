@@ -15,7 +15,7 @@ export function crearFacturaInicial() {
     docNumber: sugerirSiguienteNumero(brand, new Date().getFullYear()),
     issueDate: fechaHoy(),
     metodoPago: 'transferencia',
-    sections: [crearSeccionVacia(), crearSeccionVacia()],
+    sections: [crearSeccionVacia()],
     ivaRate: 0.21,
   };
 }

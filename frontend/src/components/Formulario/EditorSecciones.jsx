@@ -24,7 +24,7 @@ function EditorSecciones({ quote, setQuote }) {
 
   return (
     <div className="mb-5">
-      <h2 className="text-sm font-semibold text-gray-700 mb-2">Productos / partidas</h2>
+      <h2 className="text-sm font-semibold text-gray-700 mb-2">Conceptos</h2>
 
       {quote.sections.map((section, i) => (
         <SeccionItems
