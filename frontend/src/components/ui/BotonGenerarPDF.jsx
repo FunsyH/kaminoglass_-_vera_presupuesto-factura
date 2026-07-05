@@ -20,7 +20,7 @@ function BotonGenerarPDF({ quote, setQuote }) {
         onClick={generar}
         className="w-full rounded-md bg-kng-gold px-4 py-2 text-sm font-semibold text-kng-ink hover:opacity-90"
       >
-        Generar PDF
+        Guardar Presupuesto
       </button>
       <div className="mt-2 text-xs text-gray-500 leading-snug">
         <b className="text-gray-700">Al guardar el PDF:</b>
