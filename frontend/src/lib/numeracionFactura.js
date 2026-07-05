@@ -60,3 +60,39 @@ export function sugerirSiguienteNumeroSync(brand, year) {
 }
 
 export { correlativoDe }
+
+// ── Presupuesto ──────────────────────────────────────────────────────────────
+
+const PREFIJOS_PRESUPUESTO = { kng: 'KNG', vera: 'VERA' }
+
+function formatearNumeroPresupuesto(brand, year, correlativo) {
+  const prefijo = PREFIJOS_PRESUPUESTO[brand] || brand.toUpperCase()
+  return `${prefijo}-${year}-${String(correlativo).padStart(4, '0')}`
+}
+
+export async function sugerirSiguientePresupuesto(brand, year) {
+  const { data, error } = await supabase
+    .from('contadores')
+    .select('ultimo')
+    .eq('marca', brand)
+    .eq('tipo', 'presupuesto')
+    .eq('anio', year)
+    .single()
+
+  const ultimo = error || !data ? 0 : data.ultimo
+  return formatearNumeroPresupuesto(brand, year, ultimo + 1)
+}
+
+export async function confirmarPresupuestoUsado(brand, year, correlativo) {
+  await supabase
+    .from('contadores')
+    .upsert(
+      { marca: brand, tipo: 'presupuesto', anio: year, ultimo: correlativo },
+      { onConflict: 'marca,tipo,anio' }
+    )
+}
+
+export function parsearCorrelativoPresupuesto(docNumber) {
+  const match = docNumber.match(/(\d{4})-(\d+)$/)
+  return match ? { year: Number(match[1]), correlativo: Number(match[2]) } : null
+}

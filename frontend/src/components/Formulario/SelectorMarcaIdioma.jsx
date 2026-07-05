@@ -1,23 +1,14 @@
-import { numeroInicialPara } from '../../lib/estadoInicial'
+import { sugerirSiguientePresupuesto } from '../../lib/numeracionFactura'
 
-// Botones para elegir la empresa (KNG/VERA) y el idioma (ES/EN).
-// Al pulsar, actualiza el quote en el componente padre.
 function SelectorMarcaIdioma({ quote, setQuote }) {
   function cambiarLang(valor) {
     setQuote((q) => ({ ...q, lang: valor }))
   }
 
-  // Al cambiar de marca: actualiza brand y, si el número no fue editado
-  // a mano (todavía coincide con el sugerido de la marca anterior), lo
-  // sustituye por el sugerido de la marca nueva.
-  function cambiarBrand(nuevaBrand) {
-    setQuote((q) => {
-      const numeroAnterior = numeroInicialPara(q.brand)
-      const docNumber = q.event.docNumber === numeroAnterior
-        ? numeroInicialPara(nuevaBrand)
-        : q.event.docNumber
-      return { ...q, brand: nuevaBrand, event: { ...q.event, docNumber } }
-    })
+  async function cambiarBrand(nuevaBrand) {
+    const year = new Date().getFullYear()
+    const docNumber = await sugerirSiguientePresupuesto(nuevaBrand, year)
+    setQuote((q) => ({ ...q, brand: nuevaBrand, event: { ...q.event, docNumber } }))
   }
 
   return (
@@ -34,7 +25,6 @@ function SelectorMarcaIdioma({ quote, setQuote }) {
   )
 }
 
-// Grupo de botones con un título pequeño encima.
 function Grupo({ titulo, children }) {
   return (
     <div className="mb-3">
@@ -44,7 +34,6 @@ function Grupo({ titulo, children }) {
   )
 }
 
-// Botón individual; cambia de estilo si está activo.
 function Boton({ activo, onClick, children }) {
   const base = 'flex-1 rounded-md px-3 py-1.5 text-sm border transition'
   const estilo = activo

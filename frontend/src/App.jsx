@@ -6,18 +6,21 @@ import FormularioFactura from './components/Formulario/FormularioFactura'
 import DocumentoFactura from './components/Documento/DocumentoFactura'
 import { crearQuoteInicial } from './lib/estadoInicial'
 import { crearFacturaInicial } from './lib/estadoInicialFactura'
-import { sugerirSiguienteNumero } from './lib/numeracionFactura'
+import { sugerirSiguienteNumero, sugerirSiguientePresupuesto } from './lib/numeracionFactura'
 
 function App() {
   const [tabActivo, setTabActivo] = useState('presupuesto')
   const [quote, setQuote] = useState(crearQuoteInicial)
   const [factura, setFactura] = useState(crearFacturaInicial)
 
-  // Carga el número real de factura desde Supabase al arrancar.
+  // Carga los números reales desde Supabase al arrancar.
   useEffect(() => {
     const year = new Date().getFullYear()
-    sugerirSiguienteNumero(factura.brand, year).then((docNumber) => {
+    sugerirSiguienteNumero('kng', year).then((docNumber) => {
       setFactura((f) => ({ ...f, docNumber }))
+    })
+    sugerirSiguientePresupuesto('kng', year).then((docNumber) => {
+      setQuote((q) => ({ ...q, event: { ...q.event, docNumber } }))
     })
   }, [])
 

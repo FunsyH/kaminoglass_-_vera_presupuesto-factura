@@ -1,15 +1,21 @@
-import { confirmarNumeroPresupuestoUsado, siguienteNumeroPresupuesto } from '../../lib/estadoInicial'
+import { sugerirSiguientePresupuesto, confirmarPresupuestoUsado, parsearCorrelativoPresupuesto } from '../../lib/numeracionFactura'
 
-// Botón que genera el PDF usando la impresión del navegador.
-// Al imprimir: guarda el número usado para que la siguiente sugerencia
-// avance automáticamente, y actualiza el campo docNumber en el formulario.
 function BotonGenerarPDF({ quote, setQuote }) {
-  function generar() {
-    const { brand, event } = quote
-    confirmarNumeroPresupuestoUsado(brand, event.docNumber)
-    // Actualiza el formulario con el siguiente número para el próximo presupuesto.
-    const siguiente = siguienteNumeroPresupuesto(brand, event.docNumber)
+  async function generar() {
+    const { brand } = quote
+    const year = new Date().getFullYear()
+
+    // Leer número actual desde Supabase (fuente de verdad compartida).
+    const numeroActual = await sugerirSiguientePresupuesto(brand, year)
+    const parsed = parsearCorrelativoPresupuesto(numeroActual)
+    if (parsed) {
+      await confirmarPresupuestoUsado(brand, parsed.year, parsed.correlativo)
+    }
+
+    // Cargar el siguiente y actualizar el formulario.
+    const siguiente = await sugerirSiguientePresupuesto(brand, year)
     setQuote((q) => ({ ...q, event: { ...q.event, docNumber: siguiente } }))
+
     window.print()
   }
 
