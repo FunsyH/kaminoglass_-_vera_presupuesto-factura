@@ -1,12 +1,18 @@
-// Botones para elegir la empresa emisora de la factura (KNG/VERA).
-// A diferencia de Presupuesto, Factura no tiene selector de idioma.
+import { sugerirSiguienteNumero } from '../../lib/numeracionFactura'
+
 function SelectorMarcaFactura({ factura, setFactura }) {
+  async function cambiarBrand(nuevaBrand) {
+    const year = new Date().getFullYear()
+    const docNumber = await sugerirSiguienteNumero(nuevaBrand, year)
+    setFactura((f) => ({ ...f, brand: nuevaBrand, docNumber }))
+  }
+
   return (
     <div className="mb-5">
       <div className="text-xs uppercase tracking-widest text-gray-400 mb-1">Empresa</div>
       <div className="flex gap-2">
-        <Boton activo={factura.brand === 'kng'} onClick={() => setFactura((f) => ({ ...f, brand: 'kng' }))}>KNG</Boton>
-        <Boton activo={factura.brand === 'vera'} onClick={() => setFactura((f) => ({ ...f, brand: 'vera' }))}>VERA</Boton>
+        <Boton activo={factura.brand === 'kng'} onClick={() => cambiarBrand('kng')}>KNG</Boton>
+        <Boton activo={factura.brand === 'vera'} onClick={() => cambiarBrand('vera')}>VERA</Boton>
       </div>
     </div>
   )

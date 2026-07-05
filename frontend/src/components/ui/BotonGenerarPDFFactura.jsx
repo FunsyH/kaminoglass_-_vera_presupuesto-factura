@@ -1,24 +1,20 @@
-import { confirmarNumeroUsado, sugerirSiguienteNumero } from '../../lib/numeracionFactura'
+import { confirmarNumeroUsado, correlativoDe, sugerirSiguienteNumero } from '../../lib/numeracionFactura'
 import { guardarCliente } from '../../lib/clientesFrecuentes'
 
-function correlativoDe(docNumber) {
-  const match = docNumber.match(/(\d+)\/\d{4}$/)
-  return match ? Number(match[1]) : null
-}
-
 function BotonGenerarPDFFactura({ factura, setFactura, onValidar }) {
-  function generar() {
+  async function generar() {
     if (!onValidar?.()) return
 
     const year = new Date(factura.issueDate.split('/').reverse().join('-')).getFullYear()
     const correlativo = correlativoDe(factura.docNumber)
-    if (correlativo !== null) {
-      confirmarNumeroUsado(factura.brand, year, correlativo)
-    }
-    guardarCliente(factura.cliente)
 
-    // Avanza el número para la siguiente factura antes de imprimir.
-    const siguiente = sugerirSiguienteNumero(factura.brand, year)
+    if (correlativo !== null) {
+      await confirmarNumeroUsado(factura.brand, year, correlativo)
+    }
+    await guardarCliente(factura.cliente)
+
+    // Carga el siguiente número desde Supabase y actualiza el formulario.
+    const siguiente = await sugerirSiguienteNumero(factura.brand, year)
     setFactura((f) => ({ ...f, docNumber: siguiente }))
 
     window.print()

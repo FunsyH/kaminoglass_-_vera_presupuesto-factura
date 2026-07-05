@@ -1,21 +1,18 @@
-// estadoInicialFactura.js
-// Datos de arranque de una factura nueva. Sin React, sin UI.
-import { crearSeccionVacia, fechaHoy } from './estadoInicial';
-import { sugerirSiguienteNumero } from './numeracionFactura';
+import { crearSeccionVacia, fechaHoy } from './estadoInicial'
+import { sugerirSiguienteNumeroSync } from './numeracionFactura'
 
-// Devuelve una factura VACÍA lista para rellenar: marca por defecto KNG,
-// número sugerido para hoy, fecha de emisión = hoy, pago por transferencia
-// (con eso el documento ya muestra el IBAN sin que el usuario toque nada),
-// y 2 secciones vacías para empezar a escribir conceptos.
+// Devuelve una factura inicial con número placeholder ("…/2026").
+// El número real se carga de Supabase en App.jsx al montar el componente.
 export function crearFacturaInicial() {
-  const brand = 'kng';
+  const brand = 'kng'
+  const year = new Date().getFullYear()
   return {
     brand,
     cliente: { nombre: '', direccion: '', ciudad: '', cif: '' },
-    docNumber: sugerirSiguienteNumero(brand, new Date().getFullYear()),
+    docNumber: sugerirSiguienteNumeroSync(brand, year),
     issueDate: fechaHoy(),
     metodoPago: 'transferencia',
     sections: [crearSeccionVacia()],
     ivaRate: 0.21,
-  };
+  }
 }

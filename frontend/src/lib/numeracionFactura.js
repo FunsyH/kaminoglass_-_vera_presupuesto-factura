@@ -1,27 +1,15 @@
 // numeracionFactura.js
-// Sugiere y guarda el siguiente número de factura, por marca y año.
-// Sin React, sin UI: solo lee/escribe localStorage.
+// Sugiere y confirma números de factura usando Supabase como backend compartido.
+// Todas las funciones son async porque hacen llamadas a la red.
 //
 // Formato:
-// - Años hasta 2026: correlativo simple "N/AÑO" (p.ej. "11/2026").
-// - Desde 2027: prefijo de marca + correlativo de 3 cifras + año
-//   (p.ej. "K-001/2027" para KNG, "V-001/2027" para VERA).
-// - El correlativo es independiente por marca y se reinicia cada año nuevo
-//   (la clave de localStorage incluye el año, así que un año nuevo arranca
-//   siempre en 0 sin necesidad de "resetear" nada a mano).
-//
-// Por qué aislado en su propio archivo: hoy guarda en localStorage, pero el
-// proyecto migrará a Supabase más adelante. Cuando eso pase, solo hay que
-// cambiar las dos funciones de aquí (cómo se lee y cómo se guarda); el resto
-// de la app solo conoce `sugerirSiguienteNumero` y `confirmarNumeroUsado`.
+// - Años hasta 2026: "N/AÑO"  (p.ej. "11/2026")
+// - Desde 2027: "K-001/2027" (KNG) / "V-001/2027" (VERA)
+
+import { supabase } from './supabase'
 
 const PRIMER_ANIO_CON_PREFIJO = 2027
-
 const PREFIJOS = { kng: 'K', vera: 'V' }
-
-function claveCorrelativo(brand, year) {
-  return `factura-correlativo-${brand}-${year}`
-}
 
 function formatearNumero(brand, year, correlativo) {
   if (year < PRIMER_ANIO_CON_PREFIJO) {
@@ -31,35 +19,44 @@ function formatearNumero(brand, year, correlativo) {
   return `${prefijo}-${String(correlativo).padStart(3, '0')}/${year}`
 }
 
-// Números de partida para cada marca. El valor es el último USADO antes de
-// arrancar la app, así que la primera sugerencia será siempre este + 1.
-// Solo se aplica si localStorage no tiene ningún valor previo (es decir,
-// no sobreescribe facturas ya emitidas desde la app).
-const CORRELATIVOS_INICIALES = {
-  kng:  { 2026: 10 },
-  vera: { 2026: 14 },
+function correlativoDe(docNumber) {
+  const match = docNumber.match(/(\d+)\/\d{4}$/)
+  return match ? Number(match[1]) : null
 }
 
-export function inicializarCorrelativos() {
-  const year = new Date().getFullYear()
-  for (const [brand, porAnio] of Object.entries(CORRELATIVOS_INICIALES)) {
-    const clave = claveCorrelativo(brand, year)
-    if (!localStorage.getItem(clave) && porAnio[year] != null) {
-      localStorage.setItem(clave, String(porAnio[year]))
-    }
+// Lee el último correlativo usado desde Supabase y devuelve el siguiente formateado.
+export async function sugerirSiguienteNumero(brand, year) {
+  const { data, error } = await supabase
+    .from('contadores')
+    .select('ultimo')
+    .eq('marca', brand)
+    .eq('tipo', 'factura')
+    .eq('anio', year)
+    .single()
+
+  if (error || !data) {
+    // Si no existe fila aún, empezar desde 1.
+    return formatearNumero(brand, year, 1)
   }
+  return formatearNumero(brand, year, data.ultimo + 1)
 }
 
-// Devuelve el número que se le sugerirá al usuario para la PRÓXIMA factura
-// de esa marca y año (no consume el número: solo lo propone).
-export function sugerirSiguienteNumero(brand, year) {
-  const ultimo = Number(localStorage.getItem(claveCorrelativo(brand, year))) || 0
-  return formatearNumero(brand, year, ultimo + 1)
+// Guarda el correlativo usado como el nuevo último, usando upsert para que
+// funcione tanto si la fila ya existe como si no.
+export async function confirmarNumeroUsado(brand, year, correlativo) {
+  await supabase
+    .from('contadores')
+    .upsert(
+      { marca: brand, tipo: 'factura', anio: year, ultimo: correlativo },
+      { onConflict: 'marca,tipo,anio' }
+    )
 }
 
-// Guarda el correlativo como "usado" tras generar el PDF, para que la
-// siguiente sugerencia avance. Se llama solo en ese momento (no en cada
-// tecla), así mirar el formulario sin generar nada no quema números.
-export function confirmarNumeroUsado(brand, year, correlativo) {
-  localStorage.setItem(claveCorrelativo(brand, year), String(correlativo))
+// Versión síncrona para compatibilidad con el estado inicial (antes de que
+// cargue el valor real de Supabase). Devuelve un placeholder que se actualiza
+// en cuanto el componente monta y llama a sugerirSiguienteNumero.
+export function sugerirSiguienteNumeroSync(brand, year) {
+  return formatearNumero(brand, year, '…')
 }
+
+export { correlativoDe }

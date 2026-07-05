@@ -1,7 +1,12 @@
+import { useState, useEffect } from 'react'
 import { listarClientes } from '../../lib/clientesFrecuentes'
 
 function DatosCliente({ factura, setFactura, errores }) {
-  const clientes = listarClientes()
+  const [clientes, setClientes] = useState([])
+
+  useEffect(() => {
+    listarClientes().then(setClientes)
+  }, [])
 
   function cambiar(campo, valor) {
     setFactura((f) => ({ ...f, cliente: { ...f.cliente, [campo]: valor } }))
