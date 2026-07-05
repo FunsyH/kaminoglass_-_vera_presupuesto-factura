@@ -1,10 +1,17 @@
+import { useRef } from 'react'
 import { importeLinea } from '../../lib/calculos'
 import { formatEuro } from '../../lib/formato'
 
-// Fila de tabla editable: concepto, nota, cantidad, precio unitario e importe calculado.
-// refConcepto / refPrecio: refs opcionales que SeccionItems pasa solo a la última fila.
-// onUltimoTab: se llama cuando Tab o Enter se pulsa desde el precio de la última fila.
+// Fila de tabla editable. Enter avanza al siguiente campo igual que Tab.
+// En el último campo (precio) de la última fila, Enter/Tab crea una fila nueva.
 function FilaItem({ item, onChange, onEliminar, onUltimoTab, refConcepto, refPrecio }) {
+  const refNota = useRef(null)
+  const refQty = useRef(null)
+  const refPrecioInterno = useRef(null)
+
+  // Permite pasar el ref de precio tanto desde fuera (última fila) como internamente.
+  const precioRef = refPrecio ?? refPrecioInterno
+
   function cambiar(campo, valor) {
     onChange({ ...item, [campo]: valor })
   }
@@ -13,6 +20,16 @@ function FilaItem({ item, onChange, onEliminar, onUltimoTab, refConcepto, refPre
     if (texto === '' || texto === null) return null
     const n = Number(texto)
     return Number.isNaN(n) ? null : n
+  }
+
+  // Enter en cualquier campo avanza al siguiente; en precio de última fila crea fila nueva.
+  function avanzar(siguienteRef) {
+    return function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        siguienteRef?.current?.focus()
+      }
+    }
   }
 
   function manejarKeyDownPrecio(e) {
@@ -34,30 +51,35 @@ function FilaItem({ item, onChange, onEliminar, onUltimoTab, refConcepto, refPre
           placeholder="Concepto"
           value={item.description}
           onChange={(e) => cambiar('description', e.target.value)}
+          onKeyDown={avanzar(refNota)}
           className="w-full rounded border border-transparent px-2 py-1 text-sm focus:border-kng-gold focus:outline-none hover:border-gray-300"
         />
         <input
+          ref={refNota}
           type="text"
           placeholder="Nota (opcional)"
           value={item.note ?? ''}
           onChange={(e) => cambiar('note', e.target.value)}
+          onKeyDown={avanzar(refQty)}
           className="w-full rounded border border-transparent px-2 py-0.5 text-xs text-gray-400 placeholder-gray-300 focus:border-kng-gold focus:outline-none hover:border-gray-200"
         />
       </td>
       {/* Cantidad */}
       <td className="py-0.5 px-1 w-16">
         <input
+          ref={refQty}
           type="number"
           placeholder="—"
           value={item.qty ?? ''}
           onChange={(e) => cambiar('qty', aNumero(e.target.value))}
+          onKeyDown={avanzar(precioRef)}
           className="w-full rounded border border-transparent px-2 py-1 text-sm text-center focus:border-kng-gold focus:outline-none hover:border-gray-300"
         />
       </td>
       {/* Precio unitario */}
       <td className="py-0.5 px-1 w-24">
         <input
-          ref={refPrecio}
+          ref={precioRef}
           type="number"
           placeholder="—"
           value={item.unitPrice ?? ''}
