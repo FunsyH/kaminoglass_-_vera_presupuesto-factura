@@ -4,7 +4,7 @@ import { formatEuro } from '../../lib/formato'
 
 // Fila de tabla editable. Enter avanza al siguiente campo igual que Tab.
 // En el último campo (precio) de la última fila, Enter/Tab crea una fila nueva.
-function FilaItem({ item, onChange, onEliminar, onUltimoTab, refConcepto, refPrecio }) {
+function FilaItem({ item, onChange, onEliminar, onNuevaFila, onUltimoTab, refConcepto, refPrecio }) {
   const refNota = useRef(null)
   const refQty = useRef(null)
   const refPrecioInterno = useRef(null)
@@ -22,14 +22,26 @@ function FilaItem({ item, onChange, onEliminar, onUltimoTab, refConcepto, refPre
     return Number.isNaN(n) ? null : n
   }
 
-  // Enter en cualquier campo avanza al siguiente; en precio de última fila crea fila nueva.
+  // Tab avanza al siguiente campo; Enter en Concepto crea fila nueva directamente.
   function avanzar(siguienteRef) {
     return function (e) {
+      if (e.key === 'Tab' && !e.shiftKey) {
+        // Tab: comportamiento nativo, avanza al siguiente input
+      }
+      // Enter en campos que no son Concepto: avanza al siguiente
       if (e.key === 'Enter') {
         e.preventDefault()
         siguienteRef?.current?.focus()
       }
     }
+  }
+
+  function manejarKeyDownConcepto(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      onNuevaFila?.()
+    }
+    // Tab: comportamiento nativo
   }
 
   function manejarKeyDownPrecio(e) {
@@ -51,7 +63,7 @@ function FilaItem({ item, onChange, onEliminar, onUltimoTab, refConcepto, refPre
           placeholder="Concepto"
           value={item.description}
           onChange={(e) => cambiar('description', e.target.value)}
-          onKeyDown={avanzar(refNota)}
+          onKeyDown={manejarKeyDownConcepto}
           className="w-full rounded border border-transparent px-2 py-1 text-sm focus:border-kng-gold focus:outline-none hover:border-gray-300"
         />
         <input

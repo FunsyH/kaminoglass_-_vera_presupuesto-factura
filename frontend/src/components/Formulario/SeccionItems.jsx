@@ -73,6 +73,7 @@ function SeccionItems({ section, onChange, onEliminar }) {
                 item={item}
                 onChange={(itemNuevo) => cambiarItem(i, itemNuevo)}
                 onEliminar={() => eliminarItem(i)}
+                onNuevaFila={anadirItem}
                 onUltimoTab={esUltima ? anadirItem : undefined}
                 refConcepto={esUltima ? refConceptoUltima : undefined}
                 refPrecio={esUltima ? refPrecioUltima : undefined}
