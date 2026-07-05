@@ -1,34 +1,34 @@
+import { useRef } from 'react'
 import FilaItem from './FilaItem'
 import { crearItemVacio } from '../../lib/estadoInicial'
 
-// Una sección editable: título opcional, interruptor de subtotal, sus líneas
-// y botones para añadir línea o eliminar la sección entera.
 function SeccionItems({ section, onChange, onEliminar }) {
-  // Cambia el título o el interruptor de subtotal.
+  // Refs al concepto y al precio de la ÚLTIMA fila, para foco y detección de Tab/Enter.
+  const refConceptoUltima = useRef(null)
+  const refPrecioUltima = useRef(null)
+
   function cambiarCampo(campo, valor) {
     onChange({ ...section, [campo]: valor })
   }
 
-  // Reemplaza una línea por su versión editada.
   function cambiarItem(indice, itemNuevo) {
     const items = section.items.map((it, i) => (i === indice ? itemNuevo : it))
     onChange({ ...section, items })
   }
 
-  // Añade una línea vacía al final.
   function anadirItem() {
     onChange({ ...section, items: [...section.items, crearItemVacio()] })
+    setTimeout(() => refConceptoUltima.current?.focus(), 0)
   }
 
-  // Elimina una línea por su índice.
   function eliminarItem(indice) {
     const items = section.items.filter((_, i) => i !== indice)
     onChange({ ...section, items })
   }
 
   return (
-    <div className="mb-4 rounded-lg border border-gray-200 p-3 bg-white">
-      <div className="flex items-center gap-2 mb-2">
+    <div className="mb-4 rounded-lg border border-gray-200 bg-white overflow-hidden">
+      <div className="flex items-center gap-2 px-3 pt-3 pb-2">
         <input
           type="text"
           placeholder="Título de sección (opcional)"
@@ -54,22 +54,43 @@ function SeccionItems({ section, onChange, onEliminar }) {
         </button>
       </div>
 
-      {section.items.map((item, i) => (
-        <FilaItem
-          key={i}
-          item={item}
-          onChange={(itemNuevo) => cambiarItem(i, itemNuevo)}
-          onEliminar={() => eliminarItem(i)}
-        />
-      ))}
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b border-gray-200">
+            <th className="px-3 py-1 text-left text-xs font-medium text-gray-400">Concepto</th>
+            <th className="px-1 py-1 text-center text-xs font-medium text-gray-400 w-16">Cant.</th>
+            <th className="px-1 py-1 text-right text-xs font-medium text-gray-400 w-24">P. unit.</th>
+            <th className="pr-3 py-1 text-right text-xs font-medium text-gray-400 w-20">Importe</th>
+            <th className="w-6" />
+          </tr>
+        </thead>
+        <tbody>
+          {section.items.map((item, i) => {
+            const esUltima = i === section.items.length - 1
+            return (
+              <FilaItem
+                key={i}
+                item={item}
+                onChange={(itemNuevo) => cambiarItem(i, itemNuevo)}
+                onEliminar={() => eliminarItem(i)}
+                onUltimoTab={esUltima ? anadirItem : undefined}
+                refConcepto={esUltima ? refConceptoUltima : undefined}
+                refPrecio={esUltima ? refPrecioUltima : undefined}
+              />
+            )
+          })}
+        </tbody>
+      </table>
 
-      <button
-        type="button"
-        onClick={anadirItem}
-        className="mt-1 text-sm text-kng-gold hover:underline"
-      >
-        + Añadir línea
-      </button>
+      <div className="px-3 py-2">
+        <button
+          type="button"
+          onClick={anadirItem}
+          className="text-sm text-kng-gold hover:underline"
+        >
+          + Añadir línea
+        </button>
+      </div>
     </div>
   )
 }

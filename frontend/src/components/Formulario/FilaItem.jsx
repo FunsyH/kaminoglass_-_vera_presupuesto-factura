@@ -1,75 +1,87 @@
 import { importeLinea } from '../../lib/calculos'
 import { formatEuro } from '../../lib/formato'
 
-// Una fila editable del formulario: concepto, nota, cantidad y PRECIO UNITARIO.
-// El importe total (cantidad × unitario) se calcula y se muestra a la derecha,
-// no se teclea. El precio unitario es opcional (línea solo descriptiva).
-function FilaItem({ item, onChange, onEliminar }) {
+// Fila de tabla editable: concepto, nota, cantidad, precio unitario e importe calculado.
+// refConcepto / refPrecio: refs opcionales que SeccionItems pasa solo a la última fila.
+// onUltimoTab: se llama cuando Tab o Enter se pulsa desde el precio de la última fila.
+function FilaItem({ item, onChange, onEliminar, onUltimoTab, refConcepto, refPrecio }) {
   function cambiar(campo, valor) {
     onChange({ ...item, [campo]: valor })
   }
 
-  // Convierte el texto de un input numérico a número (o null si está vacío).
   function aNumero(texto) {
     if (texto === '' || texto === null) return null
     const n = Number(texto)
     return Number.isNaN(n) ? null : n
   }
 
-  // Importe total de la línea para mostrarlo (cantidad × precio unitario).
+  function manejarKeyDownPrecio(e) {
+    if ((e.key === 'Tab' && !e.shiftKey) || e.key === 'Enter') {
+      e.preventDefault()
+      onUltimoTab?.()
+    }
+  }
+
   const total = importeLinea(item)
 
   return (
-    <div className="grid grid-cols-12 gap-1 mb-1 items-start">
-      <div className="col-span-5">
+    <tr className="group border-b border-gray-100 last:border-0">
+      {/* Concepto + nota */}
+      <td className="py-0.5 px-2">
         <input
+          ref={refConcepto}
           type="text"
           placeholder="Concepto"
           value={item.description}
           onChange={(e) => cambiar('description', e.target.value)}
-          className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-kng-gold focus:outline-none"
+          className="w-full rounded border border-transparent px-2 py-1 text-sm focus:border-kng-gold focus:outline-none hover:border-gray-300"
         />
         <input
           type="text"
           placeholder="Nota (opcional)"
           value={item.note ?? ''}
           onChange={(e) => cambiar('note', e.target.value)}
-          className="w-full mt-0.5 rounded border border-gray-200 px-2 py-0.5 text-xs text-gray-500 focus:border-kng-gold focus:outline-none"
+          className="w-full rounded border border-transparent px-2 py-0.5 text-xs text-gray-400 placeholder-gray-300 focus:border-kng-gold focus:outline-none hover:border-gray-200"
         />
-      </div>
-      <div className="col-span-2">
+      </td>
+      {/* Cantidad */}
+      <td className="py-0.5 px-1 w-16">
         <input
           type="number"
-          placeholder="Cant."
+          placeholder="—"
           value={item.qty ?? ''}
           onChange={(e) => cambiar('qty', aNumero(e.target.value))}
-          className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-kng-gold focus:outline-none"
+          className="w-full rounded border border-transparent px-2 py-1 text-sm text-center focus:border-kng-gold focus:outline-none hover:border-gray-300"
         />
-      </div>
-      <div className="col-span-2">
+      </td>
+      {/* Precio unitario */}
+      <td className="py-0.5 px-1 w-24">
         <input
+          ref={refPrecio}
           type="number"
-          placeholder="P. unit."
+          placeholder="—"
           value={item.unitPrice ?? ''}
           onChange={(e) => cambiar('unitPrice', aNumero(e.target.value))}
-          className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-kng-gold focus:outline-none"
+          onKeyDown={onUltimoTab ? manejarKeyDownPrecio : undefined}
+          className="w-full rounded border border-transparent px-2 py-1 text-sm text-right focus:border-kng-gold focus:outline-none hover:border-gray-300"
         />
-      </div>
-      {/* Importe total calculado (solo lectura) */}
-      <div className="col-span-2 px-1 py-1 text-sm text-right text-gray-700 whitespace-nowrap">
+      </td>
+      {/* Importe calculado (solo lectura) */}
+      <td className="py-0.5 pr-3 w-20 text-right text-sm text-gray-600 whitespace-nowrap">
         {item.unitPrice != null ? formatEuro(total) : '—'}
-      </div>
-      <div className="col-span-1">
+      </td>
+      {/* Botón eliminar: visible solo al hacer hover sobre la fila */}
+      <td className="py-0.5 w-6">
         <button
           type="button"
           onClick={onEliminar}
           title="Eliminar línea"
-          className="w-full rounded border border-gray-200 px-1 py-1 text-sm text-gray-400 hover:border-red-300 hover:text-red-500"
+          className="opacity-0 group-hover:opacity-100 rounded px-1 py-0.5 text-xs text-gray-400 hover:text-red-500 transition-opacity"
         >
           ×
         </button>
-      </div>
-    </div>
+      </td>
+    </tr>
   )
 }
 
