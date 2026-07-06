@@ -16,6 +16,11 @@ const MM_TO_PX = 3.7795
 const ALTO_HOJA_PX = 297 * MM_TO_PX
 const MARGEN_VERTICAL_PX = 2 * 18 * MM_TO_PX
 
+// Colchón de seguridad (~8mm). Ver DocumentoFactura.jsx para el razonamiento:
+// la suma de piezas medidas no cuadra al 100% con el apilado real de márgenes,
+// y sin este margen la hoja puede rebosar su caja A4 al imprimir.
+const COLCHON_SEGURIDAD_PX = 8 * MM_TO_PX
+
 // Construye la lista lineal de bloques (titulo, item, subtotal) desde quote.
 function construirBloques(quote) {
   const bloques = []
@@ -55,8 +60,8 @@ function DocumentoPresupuesto({ quote }) {
     // Enfoque conservador: reservar siempre ese espacio garantiza que el
     // total+footer (margin-top:auto) nunca se recorten en la hoja final,
     // a cambio de un pequeno desperdicio de espacio en hojas intermedias.
-    const altoUtilPrimera = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras - medidas.metaEvento - medidas.totalFooter
-    const altoUtilSiguientes = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras - medidas.totalFooter
+    const altoUtilPrimera = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - COLCHON_SEGURIDAD_PX - altoCabeceras - medidas.metaEvento - medidas.totalFooter
+    const altoUtilSiguientes = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - COLCHON_SEGURIDAD_PX - altoCabeceras - medidas.totalFooter
     return paginarBloques(conAlto, altoUtilPrimera, altoUtilSiguientes)
   }, [listo, bloquesBase, medidas])
 

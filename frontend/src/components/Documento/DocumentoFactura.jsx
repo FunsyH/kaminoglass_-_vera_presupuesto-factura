@@ -14,6 +14,14 @@ const MM_TO_PX = 3.7795
 const ALTO_HOJA_PX = 297 * MM_TO_PX
 const MARGEN_VERTICAL_PX = 2 * 18 * MM_TO_PX
 
+// Colchón de seguridad (~8mm). La suma de piezas medidas (cabeceras, meta,
+// total) NO cuadra al 100% con cómo el motor de maquetación apila márgenes y
+// paddings reales: se observó que una hoja "que cabe" según el cálculo rebosa
+// ~4mm su caja A4 al imprimir, forzando una 2ª página con el total partido.
+// Reservar este colchón absorbe ese descuadre: es como no llenar la maleta
+// hasta el borde para que cierre sin forzar la cremallera.
+const COLCHON_SEGURIDAD_PX = 8 * MM_TO_PX
+
 function construirBloques(factura) {
   const bloques = []
   for (const section of factura.sections) {
@@ -46,8 +54,8 @@ function DocumentoFactura({ factura }) {
       alto: medidas.bloques[i] ? medidas.bloques[i].alto : 0,
     }))
     const altoCabeceras = medidas.cabeceraMarca + medidas.cabeceraTabla
-    const altoUtilPrimera = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras - medidas.metaEvento - medidas.totalFooter
-    const altoUtilSiguientes = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - altoCabeceras - medidas.totalFooter
+    const altoUtilPrimera = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - COLCHON_SEGURIDAD_PX - altoCabeceras - medidas.metaEvento - medidas.totalFooter
+    const altoUtilSiguientes = ALTO_HOJA_PX - MARGEN_VERTICAL_PX - COLCHON_SEGURIDAD_PX - altoCabeceras - medidas.totalFooter
     return paginarBloques(conAlto, altoUtilPrimera, altoUtilSiguientes)
   }, [listo, bloquesBase, medidas])
 

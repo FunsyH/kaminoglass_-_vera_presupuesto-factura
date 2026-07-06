@@ -59,3 +59,30 @@ El importe de línea = `qty × unitPrice` (antes `amount` ignoraba la cantidad).
 Para verificar de verdad (no "debería funcionar"): renderizar con Chrome headless
 `--print-to-pdf` y contar páginas + convertir a PNG con pymupdf (fitz) para revisar
 visualmente. Aislar problemas con un HTML estático mínimo cargando el mismo CSS.
+
+## Factura/Presupuesto se partían en 2 hojas con pocas líneas (jul 2026)
+
+**Síntoma:** una factura de 3-4 líneas salía en 2 páginas: hoja 1 con los ítems
+y el subtotal, y el TOTAL (IVA + total) solo en la hoja 2. Intermitente.
+
+**Root cause (probado, no supuesto):** la hoja renderizada medía `scrollHeight`
+= 301mm frente a los 297mm de su caja A4 → el contenido REBOSABA ~4mm. En pantalla
+`overflow:hidden` lo recorta (se ve 1 hoja), pero al imprimir ese desbordamiento
+fuerza una 2ª página física. `paginarBloques` metía una línea de más porque
+`altoUtilPrimera` estaba SOBREESTIMADO: la suma de piezas medidas (cabeceras, meta,
+total) no cuadra al 100% con cómo el motor apila márgenes/paddings reales.
+
+**Fix (2 partes):**
+1. `COLCHON_SEGURIDAD_PX = 8*MM_TO_PX` restado al alto útil en DocumentoFactura.jsx
+   y DocumentoPresupuesto.jsx. Absorbe el descuadre de calibración. Con esto,
+   pantalla y PDF coinciden en nº de páginas y ninguna hoja rebosa (probado N=3..20).
+2. `useMedidasDocumento` ahora RE-MIDE cuando fuentes (document.fonts.ready) e
+   imágenes de logo (<img> load) terminan de cargar. Antes medía una sola vez en
+   useLayoutEffect y si el logo/fuente cargaban tarde, el alto útil quedaba mal
+   calibrado (el logo cambia .head en ~35px).
+
+**Cómo se verificó:** Playwright + `page.pdf(preferCSSPageSize)` + pypdf para
+contar páginas, y medir `scrollHeight/offsetHeight` de `.hoja-a4`. El bug NO se
+reproducía mirando solo la pantalla (overflow:hidden lo oculta): hay que generar
+el PDF real y contar páginas. Lección: para bugs de paginación, medir el PDF
+impreso, no el DOM en pantalla.
