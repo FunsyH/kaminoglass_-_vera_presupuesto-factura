@@ -46,18 +46,14 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Tokens activos según marca (se reasignan con [data-brand]).
-   --total-text = color del texto sobre el cuadro de TOTAL (su fondo es --accent):
-   KNG dorado claro -> texto oscuro; VERA azul oscuro -> texto blanco. */
+/* Tokens activos según marca (se reasignan con [data-brand]) */
 .documento[data-brand="kng"] {
   --ink: var(--kng-ink); --accent: var(--kng-gold); --accent-d: var(--kng-gold-d);
   --bg: var(--kng-cream); --paper: var(--kng-paper); --soft: var(--kng-soft); --muted: var(--kng-muted);
-  --total-text: var(--kng-ink);
 }
 .documento[data-brand="vera"] {
   --ink: var(--vera-ink); --accent: var(--vera-blue); --accent-d: var(--vera-blue-d);
   --bg: var(--vera-bone); --paper: var(--vera-paper); --soft: var(--vera-soft); --muted: var(--vera-muted);
-  --total-text: #fff;
 }
 
 .documento .display { font-family: "utopia-std-headline", "Georgia", serif; }
@@ -101,8 +97,6 @@
 }
 
 .documento .logo-kng { width: 24mm; height: auto; display: block; }
-/* Logo VERA (imagen). Es horizontal, así que va más ancho que el de KNG. */
-.documento .logo-vera-img { width: 52mm; height: auto; display: block; }
 
 .documento .logo-vera .wordmark {
   font-family: "utopia-std-headline", serif;
@@ -168,7 +162,6 @@
 
 .documento .event-sub {
   margin-top: 0;
-  margin-bottom: 6mm;   /* separa el subtítulo de la cabecera de columnas */
   font-size: 3.1mm;
   letter-spacing: .02em;
   color: var(--muted);
@@ -199,7 +192,8 @@
   background: var(--soft);
 }
 
-/* Tabla de líneas de cada sección/hoja (.lineas, .hoja-lineas). */
+/* Tabla de líneas de cada sección (.lineas). Acotado para NO afectar a la
+   tabla maestra .doc-table (que también tiene thead/tbody/tfoot). */
 .documento .lineas { width: 100%; border-collapse: collapse; }
 .documento .lineas thead th {
   font-size: 2.7mm;
@@ -244,65 +238,34 @@
 .documento .totals {
   margin-top: 3mm;
   display: flex;
-  justify-content: flex-end;   /* bloque de totales a la DERECHA */
-  align-items: flex-end;
-  gap: 8mm;
+  justify-content: flex-end;
 }
-.documento .totals-box { width: 92mm; }
-
-/* Metodo de pago (solo Factura): a la izquierda del cuadro de TOTAL,
-   ocupa el espacio que el flex deja libre (justify-content:flex-end). */
-.documento .metodo-pago {
-  flex: 1;
-  font-size: 2.9mm;
-  line-height: 1.6;
-  color: var(--muted);
-}
-.documento .metodo-pago-label {
-  font-size: 2.7mm;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--accent-d);
-  font-weight: 600;
-  margin-bottom: 1mm;
-}
-.documento .metodo-pago-iban { color: var(--ink); font-weight: 600; }
+.documento .totals-box { width: 78mm; }
 .documento .totals-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;       /* etiqueta y monto alineados verticalmente */
   font-size: 3.6mm;
-  padding: 0.68mm 0;         /* mitad del espacio anterior (Base <-> IVA) */
+  padding: 1.8mm 0;
   color: var(--muted);
 }
 .documento .totals-row span:last-child { color: var(--ink); font-weight: 600; }
 .documento .totals-row.grand {
-  margin-top: 0.55mm;        /* mitad del espacio anterior (IVA <-> cuadro) */
-  padding: 1.5mm 4mm;        /* mitad del padding vertical (linea <-> TOTAL) */
+  margin-top: 1.5mm;
+  padding: 3.5mm 4mm;
   background: var(--accent);
-  color: var(--total-text);  /* se adapta a la marca: oscuro en KNG, blanco en VERA */
+  color: #fff;
   border-radius: 1mm;
 }
-.documento .totals-row.grand span { color: var(--total-text); }
+.documento .totals-row.grand span { color: #fff; }
 .documento .totals-row.grand .label {
   font-family: "utopia-std-headline", serif;
   font-size: 4.4mm;
   letter-spacing: .04em;
-  white-space: nowrap;   /* "TOTAL (WITHOUT IVA 21%)" en una sola línea */
 }
 .documento .totals-row.grand .value {
   font-family: "utopia-std-headline", serif;
   font-size: 5.4mm;
   font-weight: 700;
-}
-/* Etiqueta "SIN IVA" junto al TOTAL (modo manualSinIva): pequeña y sobria,
-   en sans, no en la serif del título, para que se lea como aclaración. */
-.documento .totals-row.grand .total-sin-iva {
-  font-family: "acumin-pro", Arial, sans-serif;
-  font-size: 2.6mm;
-  font-weight: 600;
-  letter-spacing: .12em;
-  opacity: .85;
 }
 
 /* ===========================================================
@@ -359,6 +322,11 @@
   color: var(--ink);
   line-height: 1.05;
   max-width: 130mm;
+  /* min-width:0 permite que este item flex se encoja por debajo de su ancho
+     de texto intrínseco cuando el contenedor es más estrecho que 210mm (p.ej.
+     área imprimible real en Safari/iOS) — sin esto empujaba a .tt-brand
+     (nowrap) fuera del ancho de página. */
+  min-width: 0;
 }
 .documento .terms-head .tt-brand {
   font-size: 2.7mm;
@@ -408,9 +376,14 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 0;            /* sobre el fondo de la hoja, detrás del contenido (z-index:1) */
+  z-index: -1;           /* SIEMPRE detrás del contenido (incluso al imprimir) */
   pointer-events: none;
   user-select: none;
+}
+/* En pantalla la centramos en la primera hoja (referencia visual); lo que
+   importa de verdad es la impresión, donde se fija a cada hoja (más abajo). */
+@media screen {
+  .documento .marca-agua { top: 148mm; } /* ~mitad de una A4 */
 }
 /* KNG: el círculo Enzo, grande y muy tenue */
 .documento .marca-agua-kng {
@@ -418,14 +391,17 @@
   height: auto;
   opacity: 0.04;
 }
-/* VERA: el logo completo, grande y tenue, igual de discreto que el wordmark anterior */
+/* VERA: el wordmark gigante, tenue, en el azul de marca */
 .documento .marca-agua-vera {
-  width: 130mm;
-  height: auto;
-  opacity: 0.06;
+  font-family: "utopia-std-headline", serif;
+  font-size: 64mm;
+  letter-spacing: .1em;
+  color: var(--vera-blue);
+  opacity: 0.05;
+  white-space: nowrap;
 }
 
-/* El contenido de la página va por encima de la marca de agua (z-index:0). */
+/* El contenido de la página va por encima de la marca de agua. */
 .documento .head,
 .documento .doc-meta,
 .documento .event-sub,
@@ -434,94 +410,192 @@
 .documento .terms,
 .documento .terms-head,
 .documento .clauses,
-.documento .foot,
-.documento .hoja-lineas,
-.documento .hoja-total,
-.documento .hoja-foot {
+.documento .foot {
   position: relative;
   z-index: 1;
 }
 
+/* ===========================================================
+   TABLA MAESTRA (página 1) — cabecera/pie repetidos por hoja
+   ---
+   El truco: thead -> table-header-group y tfoot -> table-footer-group hacen
+   que el navegador REPITA la cabecera y el pie en cada hoja al imprimir,
+   de forma nativa. El contenido va en tbody y fluye.
+   =========================================================== */
+.documento .doc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.documento .doc-table > thead { display: table-header-group; }
+.documento .doc-table > tfoot { display: table-footer-group; }
+/* La cabecera de marca lleva su separación inferior; el pie, superior. */
+.documento .doc-table > thead .head { margin-bottom: 2mm; }
+/* El espaciador del tfoot hereda de .foot (mismo alto) pero sin margin:auto
+   (no aplica en celda de tabla) y con una separación superior fija. */
+.documento .doc-table > tfoot .foot-espaciador { margin-top: 4mm; }
+
+/* En PANTALLA, la tabla maestra (página 1) parece una hoja A4 como .page. */
+@media screen {
+  .documento .doc-table {
+    display: block;
+    width: var(--page-w);
+    min-height: 297mm;
+    margin: 0 auto 8mm;
+    padding: 18mm;
+    padding-left: 23mm;
+    background-image: linear-gradient(
+      to right, var(--accent) 0, var(--accent) 5mm, var(--bg) 5mm, var(--bg) 100%
+    );
+    box-shadow: 0 6px 30px rgba(0,0,0,.18);
+  }
+  /* La tabla maestra en pantalla es una columna flex: el cuerpo crece y
+     empuja el pie al fondo de la hoja, haya pocos o muchos ítems. */
+  .documento .doc-table { display: flex; flex-direction: column; }
+  .documento .doc-table > thead,
+  .documento .doc-table > tfoot,
+  .documento .doc-table > thead > tr,
+  .documento .doc-table > tfoot > tr,
+  .documento .doc-table > tbody > tr,
+  .documento .doc-table > thead > tr > td,
+  .documento .doc-table > tfoot > tr > td,
+  .documento .doc-table > tbody > tr > td {
+    display: block;
+  }
+  .documento .doc-table > tbody { display: block; flex: 1; }   /* el cuerpo ocupa el alto disponible */
+  .documento .doc-table > tfoot { margin-top: auto; }          /* el pie, al fondo */
+}
+
 .documento .nota-aceptacion {
-  /* Absorbe el espacio sobrante entre las cláusulas y el footer, centrándose
-     en él, en vez de dejar un vacío grande pegado abajo. */
-  margin: auto 0;
-  padding: 6mm 0;
+  margin-top: 6mm;
   font-size: 2.6mm;
   color: var(--muted);
   text-align: center;
 }
 
-/* ===========================================================
-   HOJA A4 PAGINADA — alto fijo, identica en pantalla y PDF
-   =========================================================== */
-.documento .hoja-a4 {
-  position: relative;
-  width: 210mm;
-  height: 297mm;
-  margin: 0 auto 8mm;
-  padding: 18mm;
-  padding-left: 23mm;            /* hueco para el filete de acento */
-  background-image: linear-gradient(
-    to right, var(--accent) 0, var(--accent) 5mm, var(--bg) 5mm, var(--bg) 100%
-  );
-  box-shadow: 0 6px 30px rgba(0,0,0,.18);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+/* En pantalla: .documento es el ancestro posicionado de referencia para
+   .marca-agua (position:absolute). Además el pie fijo se ancla al fondo de la
+   primera hoja A4 como referencia visual (en impresión se repite en cada hoja).
+   Los espaciadores del pie no deben ocupar hueco visible en pantalla. */
+@media screen {
+  .documento { position: relative; }
+  .documento .foot-fijo {
+    position: absolute;
+    left: 23mm; right: 18mm;
+    top: calc(297mm - 18mm);   /* cerca del fondo de la 1ª hoja A4 */
+  }
+  .documento .foot-espaciador,
+  .documento .foot-espaciador-pagina { display: none; }
 }
-/* La cabecera de tabla y las filas ocupan su alto natural; el total se va al
-   fondo (margin-top:auto) y el footer cierra debajo. */
-.documento .hoja-a4 .hoja-lineas { width: 100%; }
-/* Modo sin IVA: solo la columna Concepto. Acotamos el ancho de la tabla
-   (a la izquierda) para que no quede un gran vacío a la derecha, sin romper
-   la alineación ni la legibilidad de la lista. */
-.documento .hoja-a4 .hoja-lineas.solo-concepto { width: 115mm; }
-/* En hojas 2+ la tabla va justo tras la cabecera de marca (sin meta-evento en
-   medio). El selector adyacente .head + .hoja-lineas solo matchea ese caso y
-   le da aire, para que la cabecera de columnas no quede pegada al logo/datos. */
-.documento .hoja-a4 .head + .hoja-lineas { margin-top: 7mm; }
-/* En la ULTIMA hoja: el total se va al fondo (margin-top:auto) y el footer
-   queda justo debajo. En hojas INTERMEDIAS no hay total, asi que es el footer
-   quien toma margin-top:auto y baja al fondo. Ambos casos cubiertos abajo. */
-.documento .hoja-a4 .hoja-total { margin-top: auto; }
-.documento .hoja-a4 .hoja-foot { margin-top: 3mm; }
-.documento .hoja-a4 > .hoja-foot:last-child { margin-top: auto; }
-/* Cuando el total existe, va al fondo (margin-top:auto) y el footer queda
-   pegado justo debajo, con separación mínima (no los 3mm genéricos). */
-.documento .hoja-a4 .hoja-total + .hoja-foot { margin-top: 2mm; }
-.documento .hoja-a4 .fila-titulo td { padding-top: 4mm; }
-/* El pie propio de la página 2 (condiciones) baja al fondo de su hoja. */
-.documento .pagina-condiciones > .hoja-foot { margin-top: auto; }
 
-/* Zona de medición: la HojaA4 que se mide debe tener alto NATURAL (no fijo) y
-   sin recorte, para que cada elemento mida su alto real. El total no se ancla
-   al fondo aquí (margin-top:0) para medir su alto intrínseco. */
-.zona-medicion .hoja-a4 { height: auto; overflow: visible; }
-.zona-medicion .hoja-a4 .hoja-total,
-.zona-medicion .hoja-a4 > .hoja-foot:last-child { margin-top: 0; }
+/* ===========================================================
+   IMPRESIÓN / PDF
+   ---
+   El @page reserva 12mm arriba y 20mm abajo en CADA hoja. La cabecera se
+   repite vía thead (table-header-group). El pie es un footer position:fixed
+   (.foot-fijo) anclado al fondo de cada hoja física dentro del margen inferior
+   de @page, así queda SIEMPRE pegado abajo. El <tfoot> y un espaciador en la
+   página 2 reservan ese hueco (invisibles) para que el contenido no lo invada.
+   =========================================================== */
+@page { size: A4; margin: 12mm 0 20mm 0; }
 
 @media print {
+  /* Oculta toda la interfaz; solo se imprime el documento. */
   .no-print { display: none !important; }
-  html, body, #root { height: auto !important; overflow: visible !important; }
-  .app-layout { display: block !important; }
-  .zona-documento { height: auto !important; overflow: visible !important; padding: 0 !important; display: block !important; }
 
-  /* Cada hoja A4 ocupa exactamente una pagina fisica. */
-  .documento .hoja-a4 { margin: 0; box-shadow: none; break-after: page; }
-  .documento .hoja-a4:last-of-type { break-after: auto; }
+  /* Neutraliza el layout de la app (flex + scroll) para que el documento
+     no quede recortado a la altura de pantalla al imprimir.
+     El width:100% explícito es clave en Safari/iOS: en móvil el contenido de
+     210mm se sale del viewport en pantalla (overflow-x), y el motor de
+     impresión de WebKit iOS hereda ese ancho de layout de pantalla en vez de
+     recalcularlo para la hoja A4 — eso es lo que causaba el corte del lado
+     derecho. Fijar 100% en toda la cadena de contenedores evita que arrastren
+     el ancho de pantalla al imprimir. */
+  html, body, #root {
+    height: auto !important;
+    overflow: visible !important;
+    width: 100% !important;
+  }
+  .app-layout { display: block !important; width: 100% !important; }
+  .zona-documento {
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  .documento { width: 100% !important; }
+  /* La tabla maestra vuelve a comportarse como tabla normal en impresión.
+     table-layout:fixed es clave: sin él, una <table> se expande a su ancho
+     de contenido mínimo (columnas en mm, .totals-box de 78mm, etc.) e ignora
+     width:100% si ese contenido no cabe — eso es lo que la desbordaba por la
+     derecha en el área imprimible real de Safari/iOS (aquí reproducido con
+     un viewport de impresión más estrecho que 210mm). */
+  .documento .doc-table { display: table; width: 100%; table-layout: fixed; }
+  .documento .doc-table > thead { display: table-header-group; }
+  .documento .doc-table > tbody { display: table-row-group; }
 
-  /* La pagina 2 de condiciones empieza en hoja nueva, con el mismo reset
-     de margen/sombra que las hojas A4 (consistencia entre paginas impresas).
-     ALTO FIJO 297mm tambien en impresion: si no, al imprimir solo ocupa el
-     alto del contenido y queda blanco abajo (en pantalla si tiene min-height). */
-  .documento .pagina-condiciones {
-    margin: 0; box-shadow: none; break-before: page;
-    height: 297mm;
+  /* El contenido respeta 18mm laterales; el vertical lo da @page. */
+  .documento .doc-table > thead > tr > td,
+  .documento .doc-table > tbody > tr > td,
+  .documento .doc-table > tfoot > tr > td {
+    padding: 0 18mm;
   }
 
-  /* No partir filas ni clausulas. */
-  .documento .lineas tr, .documento .clause { break-inside: avoid; }
-}
+  /* La página 2 (condiciones) empieza en hoja nueva.
+     width:100% anula el width:210mm fijo de la regla base (fuera de media
+     query, línea ~66) — ese ancho fijo es el que se salía del área
+     imprimible en Safari/iOS y cortaba la página 2 por la derecha. */
+  .documento .page {
+    width: 100%;
+    margin: 0; box-shadow: none; min-height: 0;
+    padding: 0 18mm;
+    background-image: none;
+    display: block;
+  }
+  .documento .pagina-condiciones { break-before: page; }
 
-@page { size: A4; margin: 0; }
+  /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
+  .documento::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 5mm; height: 100%;
+    background: var(--accent);
+  }
+
+  /* Marca de agua: fija respecto a la hoja física, centrada, en cada página. */
+  .documento .marca-agua {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* --- PIE DE PÁGINA VISIBLE: anclado al fondo de CADA hoja física ---
+     Vive dentro del margen inferior de 20mm que reserva @page, así nunca
+     tapa contenido (el contenido no entra en ese margen) y queda siempre
+     pegado abajo, haya mucho o poco contenido en la hoja. */
+  .documento .foot-fijo {
+    position: fixed;
+    left: 23mm; right: 18mm;   /* 18mm + 5mm del filete de acento a la izquierda */
+    bottom: 6mm;               /* dentro del margen inferior reservado por @page */
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 3mm;
+    border-top: .3mm solid var(--soft);
+    background: transparent;
+  }
+
+  /* El <tfoot> y el espaciador de la página 2 reservan el hueco del pie pero
+     NO se ven: el pie visible es el .foot-fijo de arriba. Sin esto, el
+     contenido llegaría al borde y el pie fixed lo taparía. */
+  .documento .foot-espaciador { visibility: hidden; }
+  .documento .foot-espaciador-pagina { height: 16mm; }
+
+  /* Reglas de paginación: no partir filas de líneas/cláusulas. */
+  .documento .lineas tr, .documento .clause { break-inside: avoid; }
+  .documento .section-title { break-after: avoid; }
+  .documento .totals { break-inside: avoid; }
+  .documento .terms { break-inside: avoid; }
+}
