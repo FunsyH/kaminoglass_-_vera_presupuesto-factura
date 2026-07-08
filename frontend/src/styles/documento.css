@@ -524,6 +524,24 @@
 }
 
 /* ===========================================================
+   VISTA PREVIA RESPONSIVE (pantallas más estrechas que una A4)
+   ---
+   El documento siempre mide 210mm de ancho (fiel al PDF). En móvil eso no
+   cabe en el viewport, así que se ESCALA visualmente con zoom (a diferencia
+   de transform:scale, "zoom" SÍ reduce el espacio real que el elemento
+   ocupa en el layout, así que no deja huecos en blanco debajo). Esto solo
+   afecta a @media screen — el PDF real depende únicamente de @media print
+   y no se ve afectado.
+   Safari e iOS Safari soportan zoom de forma nativa desde siempre (viene de
+   ahí); Chrome y Firefox modernos también. */
+@media screen and (max-width: 860px) {
+  .zona-documento { display: block; }
+  .documento {
+    zoom: calc((100vw - 12mm) / 210mm);
+  }
+}
+
+/* ===========================================================
    HOJA A4 PAGINADA — alto fijo, identica en pantalla y PDF
    ---
    Usada por DocumentoFactura.jsx / HojaA4Factura.jsx (paginación calculada

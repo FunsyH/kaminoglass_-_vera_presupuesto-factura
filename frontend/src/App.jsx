@@ -25,20 +25,20 @@ function App() {
   }, [])
 
   return (
-    <div className="app-layout h-screen flex flex-col">
+    <div className="app-layout h-auto md:h-screen flex flex-col">
       <TabsPrincipales tabActivo={tabActivo} setTabActivo={setTabActivo} />
 
       {tabActivo === 'presupuesto' ? (
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 flex-col md:flex-row overflow-visible md:overflow-hidden">
           <FormularioPresupuesto quote={quote} setQuote={setQuote} />
-          <div className="zona-documento flex-1 h-full overflow-y-auto py-8 flex justify-center">
+          <div className="zona-documento flex-1 md:h-full overflow-visible md:overflow-y-auto py-8 flex justify-center">
             <DocumentoPresupuesto quote={quote} />
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 flex-col md:flex-row overflow-visible md:overflow-hidden">
           <FormularioFactura factura={factura} setFactura={setFactura} />
-          <div className="zona-documento flex-1 h-full overflow-y-auto py-8 flex justify-center">
+          <div className="zona-documento flex-1 md:h-full overflow-visible md:overflow-y-auto py-8 flex justify-center">
             <DocumentoFactura factura={factura} />
           </div>
         </div>
