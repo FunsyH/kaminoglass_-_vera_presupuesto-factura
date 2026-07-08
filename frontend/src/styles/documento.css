@@ -46,14 +46,18 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Tokens activos según marca (se reasignan con [data-brand]) */
+/* Tokens activos según marca (se reasignan con [data-brand]).
+   --total-text = color del texto sobre el cuadro de TOTAL (su fondo es --accent):
+   KNG dorado claro -> texto oscuro; VERA azul oscuro -> texto blanco. */
 .documento[data-brand="kng"] {
   --ink: var(--kng-ink); --accent: var(--kng-gold); --accent-d: var(--kng-gold-d);
   --bg: var(--kng-cream); --paper: var(--kng-paper); --soft: var(--kng-soft); --muted: var(--kng-muted);
+  --total-text: var(--kng-ink);
 }
 .documento[data-brand="vera"] {
   --ink: var(--vera-ink); --accent: var(--vera-blue); --accent-d: var(--vera-blue-d);
   --bg: var(--vera-bone); --paper: var(--vera-paper); --soft: var(--vera-soft); --muted: var(--vera-muted);
+  --total-text: #fff;
 }
 
 .documento .display { font-family: "utopia-std-headline", "Georgia", serif; }
@@ -97,6 +101,8 @@
 }
 
 .documento .logo-kng { width: 24mm; height: auto; display: block; }
+/* Logo VERA (imagen). Es horizontal, así que va más ancho que el de KNG. */
+.documento .logo-vera-img { width: 52mm; height: auto; display: block; }
 
 .documento .logo-vera .wordmark {
   font-family: "utopia-std-headline", serif;
@@ -162,6 +168,7 @@
 
 .documento .event-sub {
   margin-top: 0;
+  margin-bottom: 6mm;   /* separa el subtítulo de la cabecera de columnas */
   font-size: 3.1mm;
   letter-spacing: .02em;
   color: var(--muted);
@@ -238,34 +245,65 @@
 .documento .totals {
   margin-top: 3mm;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-end;   /* bloque de totales a la DERECHA */
+  align-items: flex-end;
+  gap: 8mm;
 }
-.documento .totals-box { width: 78mm; }
+.documento .totals-box { width: 92mm; }
+
+/* Metodo de pago (solo Factura): a la izquierda del cuadro de TOTAL,
+   ocupa el espacio que el flex deja libre (justify-content:flex-end). */
+.documento .metodo-pago {
+  flex: 1;
+  font-size: 2.9mm;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.documento .metodo-pago-label {
+  font-size: 2.7mm;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent-d);
+  font-weight: 600;
+  margin-bottom: 1mm;
+}
+.documento .metodo-pago-iban { color: var(--ink); font-weight: 600; }
 .documento .totals-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;       /* etiqueta y monto alineados verticalmente */
   font-size: 3.6mm;
-  padding: 1.8mm 0;
+  padding: 0.68mm 0;         /* mitad del espacio anterior (Base <-> IVA) */
   color: var(--muted);
 }
 .documento .totals-row span:last-child { color: var(--ink); font-weight: 600; }
 .documento .totals-row.grand {
-  margin-top: 1.5mm;
-  padding: 3.5mm 4mm;
+  margin-top: 0.55mm;        /* mitad del espacio anterior (IVA <-> cuadro) */
+  padding: 1.5mm 4mm;        /* mitad del padding vertical (linea <-> TOTAL) */
   background: var(--accent);
-  color: #fff;
+  color: var(--total-text);  /* se adapta a la marca: oscuro en KNG, blanco en VERA */
   border-radius: 1mm;
 }
-.documento .totals-row.grand span { color: #fff; }
+.documento .totals-row.grand span { color: var(--total-text); }
 .documento .totals-row.grand .label {
   font-family: "utopia-std-headline", serif;
   font-size: 4.4mm;
   letter-spacing: .04em;
+  white-space: nowrap;   /* "TOTAL (WITHOUT IVA 21%)" en una sola línea */
 }
 .documento .totals-row.grand .value {
   font-family: "utopia-std-headline", serif;
   font-size: 5.4mm;
   font-weight: 700;
+}
+/* Etiqueta "SIN IVA" junto al TOTAL (modo manualSinIva): pequeña y sobria,
+   en sans, no en la serif del título, para que se lea como aclaración. */
+.documento .totals-row.grand .total-sin-iva {
+  font-family: "acumin-pro", Arial, sans-serif;
+  font-size: 2.6mm;
+  font-weight: 600;
+  letter-spacing: .12em;
+  opacity: .85;
 }
 
 /* ===========================================================
@@ -376,14 +414,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: -1;           /* SIEMPRE detrás del contenido (incluso al imprimir) */
+  z-index: 0;            /* sobre el fondo de la hoja, detrás del contenido (z-index:1) */
   pointer-events: none;
   user-select: none;
-}
-/* En pantalla la centramos en la primera hoja (referencia visual); lo que
-   importa de verdad es la impresión, donde se fija a cada hoja (más abajo). */
-@media screen {
-  .documento .marca-agua { top: 148mm; } /* ~mitad de una A4 */
 }
 /* KNG: el círculo Enzo, grande y muy tenue */
 .documento .marca-agua-kng {
@@ -401,7 +434,7 @@
   white-space: nowrap;
 }
 
-/* El contenido de la página va por encima de la marca de agua. */
+/* El contenido de la página va por encima de la marca de agua (z-index:0). */
 .documento .head,
 .documento .doc-meta,
 .documento .event-sub,
@@ -410,7 +443,10 @@
 .documento .terms,
 .documento .terms-head,
 .documento .clauses,
-.documento .foot {
+.documento .foot,
+.documento .hoja-lineas,
+.documento .hoja-total,
+.documento .hoja-foot {
   position: relative;
   z-index: 1;
 }
@@ -488,6 +524,60 @@
 }
 
 /* ===========================================================
+   HOJA A4 PAGINADA — alto fijo, identica en pantalla y PDF
+   ---
+   Usada por DocumentoFactura.jsx / HojaA4Factura.jsx (paginación calculada
+   en JS con paginarBloques + useMedidasDocumento). DocumentoPresupuesto.jsx
+   ya no la usa (migró a la tabla maestra .doc-table de arriba), pero Factura
+   sigue dependiendo de estas clases — no eliminar sin migrar Factura también.
+   =========================================================== */
+.documento .hoja-a4 {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto 8mm;
+  padding: 18mm;
+  padding-left: 23mm;            /* hueco para el filete de acento */
+  background-image: linear-gradient(
+    to right, var(--accent) 0, var(--accent) 5mm, var(--bg) 5mm, var(--bg) 100%
+  );
+  box-shadow: 0 6px 30px rgba(0,0,0,.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* La cabecera de tabla y las filas ocupan su alto natural; el total se va al
+   fondo (margin-top:auto) y el footer cierra debajo. */
+.documento .hoja-a4 .hoja-lineas { width: 100%; }
+/* Modo sin IVA: solo la columna Concepto. Acotamos el ancho de la tabla
+   (a la izquierda) para que no quede un gran vacío a la derecha, sin romper
+   la alineación ni la legibilidad de la lista. */
+.documento .hoja-a4 .hoja-lineas.solo-concepto { width: 115mm; }
+/* En hojas 2+ la tabla va justo tras la cabecera de marca (sin meta-evento en
+   medio). El selector adyacente .head + .hoja-lineas solo matchea ese caso y
+   le da aire, para que la cabecera de columnas no quede pegada al logo/datos. */
+.documento .hoja-a4 .head + .hoja-lineas { margin-top: 7mm; }
+/* En la ULTIMA hoja: el total se va al fondo (margin-top:auto) y el footer
+   queda justo debajo. En hojas INTERMEDIAS no hay total, asi que es el footer
+   quien toma margin-top:auto y baja al fondo. Ambos casos cubiertos abajo. */
+.documento .hoja-a4 .hoja-total { margin-top: auto; }
+.documento .hoja-a4 .hoja-foot { margin-top: 3mm; }
+.documento .hoja-a4 > .hoja-foot:last-child { margin-top: auto; }
+/* Cuando el total existe, va al fondo (margin-top:auto) y el footer queda
+   pegado justo debajo, con separación mínima (no los 3mm genéricos). */
+.documento .hoja-a4 .hoja-total + .hoja-foot { margin-top: 2mm; }
+.documento .hoja-a4 .fila-titulo td { padding-top: 4mm; }
+/* El pie propio de la página 2 (condiciones) baja al fondo de su hoja. */
+.documento .pagina-condiciones > .hoja-foot { margin-top: auto; }
+
+/* Zona de medición: la HojaA4 que se mide debe tener alto NATURAL (no fijo) y
+   sin recorte, para que cada elemento mida su alto real. El total no se ancla
+   al fondo aquí (margin-top:0) para medir su alto intrínseco. */
+.zona-medicion .hoja-a4 { height: auto; overflow: visible; }
+.zona-medicion .hoja-a4 .hoja-total,
+.zona-medicion .hoja-a4 > .hoja-foot:last-child { margin-top: 0; }
+
+/* ===========================================================
    IMPRESIÓN / PDF
    ---
    El @page reserva 12mm arriba y 20mm abajo en CADA hoja. La cabecera se
@@ -553,6 +643,11 @@
     display: block;
   }
   .documento .pagina-condiciones { break-before: page; }
+
+  /* Factura (arquitectura .hoja-a4, paginación calculada en JS): cada hoja
+     ocupa exactamente una página física. */
+  .documento .hoja-a4 { margin: 0; box-shadow: none; break-after: page; }
+  .documento .hoja-a4:last-of-type { break-after: auto; }
 
   /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
   .documento::before {
