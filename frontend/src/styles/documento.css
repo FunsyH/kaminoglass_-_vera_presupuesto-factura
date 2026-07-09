@@ -669,11 +669,15 @@
      vertical (32mm) — un bloque de 297mm de ALTO FIJO nunca cabe en los
      265mm de área imprimible que quedan, así que SIEMPRE se partía en 2
      páginas físicas (con el total cayendo a la 2ª), sin importar cuán poco
-     contenido tuviera. min-height:265mm delimita esa misma área imprimible
-     como mínimo (permite que .hoja-total se ancle abajo vía margin-top:auto
-     cuando sobra hueco), pero deja crecer el bloque si el contenido real
-     pesa más — y es break-after:page quien corta cada hoja física. */
-  .documento .hoja-a4 { height: auto; min-height: 265mm; margin: 0; box-shadow: none; break-after: page; }
+     contenido tuviera. min-height:261mm (265mm - 4mm de colchón) delimita
+     esa área imprimible como mínimo (permite que .hoja-total se ancle abajo
+     vía margin-top:auto cuando sobra hueco), con margen de sobra para el
+     redondeo de sub-píxel del motor de impresión real (headless calculaba
+     265mm exactos y cabía, pero al límite exacto un motor de impresión real
+     puede rebosar por decimales y generar una 2ª página en blanco). Deja
+     crecer el bloque si el contenido real pesa más — y es break-after:page
+     quien corta cada hoja física. */
+  .documento .hoja-a4 { height: auto; min-height: 261mm; margin: 0; box-shadow: none; break-after: page; }
   .documento .hoja-a4:last-of-type { break-after: auto; }
 
   /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
