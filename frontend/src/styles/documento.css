@@ -663,8 +663,15 @@
   .documento .pagina-condiciones { break-before: page; }
 
   /* Factura (arquitectura .hoja-a4, paginación calculada en JS): cada hoja
-     ocupa exactamente una página física. */
-  .documento .hoja-a4 { margin: 0; box-shadow: none; break-after: page; }
+     ocupa exactamente una página física.
+     height:auto es clave: en pantalla .hoja-a4 tiene height:297mm fijo para
+     PARECER una hoja A4, pero @page ya reserva 12mm+20mm de margen vertical
+     (32mm) — un bloque de 297mm de alto nunca cabe en los 265mm de área
+     imprimible que quedan, así que SIEMPRE se partía en 2 páginas físicas
+     (con el total cayendo a la 2ª) sin importar cuán poco contenido tuviera.
+     Con height:auto el bloque mide lo que su contenido real ocupa, y es
+     break-after:page quien decide dónde corta cada hoja física. */
+  .documento .hoja-a4 { height: auto; margin: 0; box-shadow: none; break-after: page; }
   .documento .hoja-a4:last-of-type { break-after: auto; }
 
   /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
