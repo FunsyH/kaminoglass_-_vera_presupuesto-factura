@@ -493,22 +493,12 @@
   .documento .doc-table > tfoot > tr,
   .documento .doc-table > tbody > tr,
   .documento .doc-table > thead > tr > td,
-  .documento .doc-table > tfoot > tr > td {
+  .documento .doc-table > tfoot > tr > td,
+  .documento .doc-table > tbody > tr > td {
     display: block;
   }
   .documento .doc-table > tbody { display: block; flex: 1; }   /* el cuerpo ocupa el alto disponible */
   .documento .doc-table > tfoot { margin-top: auto; }          /* el pie, al fondo */
-
-  /* La celda del tbody es en sí una columna flex de alto completo: así
-     .totals (dentro de ella) puede anclarse al fondo con margin-top:auto,
-     igual que .hoja-total en la Factura — el TOTAL siempre en el margen
-     inferior de la hoja, haya pocas o muchas líneas de conceptos. */
-  .documento .doc-table > tbody > tr > td {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  .documento .doc-table > tbody .totals { margin-top: auto; }
 }
 
 .documento .nota-aceptacion {
@@ -614,7 +604,10 @@
    de @page, así queda SIEMPRE pegado abajo. El <tfoot> y un espaciador en la
    página 2 reservan ese hueco (invisibles) para que el contenido no lo invada.
    =========================================================== */
-@page { size: A4; margin: 12mm 0 20mm 0; }
+/* margin:0 -> la hoja de contenido (.hoja-a4) ocupa los 297mm físicos
+   COMPLETOS de la A4, sin franjas en blanco arriba/abajo. El respiro interior
+   lo da el padding:18mm de .hoja-a4, no el margen de página. */
+@page { size: A4; margin: 0; }
 
 @media print {
   /* Oculta toda la interfaz; solo se imprime el documento. */
@@ -672,19 +665,13 @@
   }
   .documento .pagina-condiciones { break-before: page; }
 
-  /* Factura (arquitectura .hoja-a4, paginación calculada en JS): cada hoja
-     ocupa exactamente una página física.
-     height:265mm (no 297mm): en pantalla .hoja-a4 usa height:297mm fijo para
-     PARECER una hoja A4 completa, pero @page ya reserva 12mm+20mm de margen
-     vertical (32mm) en CADA hoja física — un bloque de 297mm de alto nunca
-     cabe en los 265mm de área imprimible que quedan (297-32), así que
-     SIEMPRE se partía en 2 páginas físicas con el total cayendo a la 2ª.
-     265mm es EXACTO (no min-height con colchón): usar menos deja huecos en
-     blanco arriba/abajo del bloque de color; usar más vuelve a desbordar.
-     El propio sistema de paginación en JS (paginarBloques) ya reparte las
-     líneas para que cada hoja quepa en ese alto — ver ALTO_UTIL en
-     DocumentoFactura.jsx, que debe usar esta misma cifra de 265mm. */
-  .documento .hoja-a4 { height: 265mm; margin: 0; box-shadow: none; break-after: page; }
+  /* Presupuesto y Factura (arquitectura .hoja-a4, paginación calculada en JS):
+     cada hoja ocupa exactamente una página física A4 COMPLETA.
+     Con @page margin:0, la hoja imprimible mide los 297mm íntegros, así que
+     .hoja-a4 mide 297mm y llena el papel sin franjas en blanco arriba/abajo.
+     break-after:page fuerza el salto tras cada hoja; el paginado JS ya reparte
+     las líneas para que el contenido de cada hoja quepa en esos 297mm. */
+  .documento .hoja-a4 { height: 297mm; margin: 0; box-shadow: none; break-after: page; }
   .documento .hoja-a4:last-of-type { break-after: auto; }
 
   /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
