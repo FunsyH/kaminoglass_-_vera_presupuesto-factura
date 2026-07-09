@@ -493,12 +493,22 @@
   .documento .doc-table > tfoot > tr,
   .documento .doc-table > tbody > tr,
   .documento .doc-table > thead > tr > td,
-  .documento .doc-table > tfoot > tr > td,
-  .documento .doc-table > tbody > tr > td {
+  .documento .doc-table > tfoot > tr > td {
     display: block;
   }
   .documento .doc-table > tbody { display: block; flex: 1; }   /* el cuerpo ocupa el alto disponible */
   .documento .doc-table > tfoot { margin-top: auto; }          /* el pie, al fondo */
+
+  /* La celda del tbody es en sí una columna flex de alto completo: así
+     .totals (dentro de ella) puede anclarse al fondo con margin-top:auto,
+     igual que .hoja-total en la Factura — el TOTAL siempre en el margen
+     inferior de la hoja, haya pocas o muchas líneas de conceptos. */
+  .documento .doc-table > tbody > tr > td {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .documento .doc-table > tbody .totals { margin-top: auto; }
 }
 
 .documento .nota-aceptacion {
