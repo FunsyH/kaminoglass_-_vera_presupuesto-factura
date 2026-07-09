@@ -663,29 +663,36 @@
     background-image: none;
     display: block;
   }
-  .documento .pagina-condiciones { break-before: page; }
-
   /* Presupuesto y Factura (arquitectura .hoja-a4, paginación calculada en JS):
      cada hoja ocupa exactamente una página física A4 COMPLETA.
      Con @page margin:0, la hoja imprimible mide los 297mm íntegros, así que
      .hoja-a4 mide 297mm y llena el papel sin franjas en blanco arriba/abajo.
-     break-after:page fuerza el salto tras cada hoja; el paginado JS ya reparte
-     las líneas para que el contenido de cada hoja quepa en esos 297mm. */
-  .documento .hoja-a4 { height: 297mm; margin: 0; box-shadow: none; break-after: page; }
-  .documento .hoja-a4:last-of-type { break-after: auto; }
 
-  /* Filete de acento: franja fija de 5mm a la izquierda, en cada hoja. */
-  .documento::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0;
-    width: 5mm; height: 100%;
-    background: var(--accent);
-  }
+     Paginación SIN break-* explícitos: como cada hoja mide 297mm EXACTOS
+     (= 1 página física), el salto entre hojas ocurre de forma natural al
+     llenarse la página. Poner además break-after:page en cada hoja + un
+     break-before:page en .pagina-condiciones causaba en Safari iOS un DOBLE
+     salto (la hoja llena la página → cursor ya al inicio de la siguiente →
+     el break forzado añade OTRA página) → una hoja en blanco intermedia.
+     Al quitar los break-* explícitos, cada hoja de 297mm cae en su página y
+     condiciones en la siguiente, sin fantasmas. Chromium ya lo hacía bien;
+     esto lo alinea también para Safari iOS. */
+  .documento .hoja-a4 { height: 297mm; margin: 0; box-shadow: none; }
 
-  /* Marca de agua: fija respecto a la hoja física, centrada, en cada página. */
+  /* El filete de acento NO se dibuja aquí en impresión: cada .hoja-a4 ya lo
+     lleva en su background-image (el gradiente dorado de 5mm a la izquierda),
+     así que un ::before position:fixed sobra. Además, en Safari iOS los
+     elementos position:fixed al imprimir se materializan en UNA página propia
+     (creando una hoja fantasma en medio del PDF) — por eso se evitan aquí.
+
+     Marca de agua: absolute respecto a su .hoja-a4 (que es position:relative
+     y 297mm = 1 página), centrada en la hoja. Antes era position:fixed y en
+     Safari iOS eso generaba la hoja fantasma; como absolute queda dentro de
+     su hoja (recortada por el overflow:hidden de .hoja-a4) sin escaparse. En
+     escritorio el resultado visual es el mismo: el centro de la hoja de 297mm
+     coincide con el centro de la página física. */
   .documento .marca-agua {
-    position: fixed;
+    position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
   }
