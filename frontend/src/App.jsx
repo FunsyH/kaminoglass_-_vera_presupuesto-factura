@@ -7,6 +7,7 @@ import DocumentoFactura from './components/Documento/DocumentoFactura'
 import { crearQuoteInicial } from './lib/estadoInicial'
 import { crearFacturaInicial } from './lib/estadoInicialFactura'
 import { sugerirSiguienteNumero, sugerirSiguientePresupuesto } from './lib/numeracionFactura'
+import AvisoSoloEscritorio from './components/ui/AvisoSoloEscritorio'
 
 function App() {
   const [tabActivo, setTabActivo] = useState('presupuesto')
@@ -25,25 +26,28 @@ function App() {
   }, [])
 
   return (
-    <div className="app-layout h-auto md:h-screen flex flex-col">
-      <TabsPrincipales tabActivo={tabActivo} setTabActivo={setTabActivo} />
+    <>
+      <AvisoSoloEscritorio />
+      <div className="app-layout hidden h-screen md:flex flex-col">
+        <TabsPrincipales tabActivo={tabActivo} setTabActivo={setTabActivo} />
 
-      {tabActivo === 'presupuesto' ? (
-        <div className="flex flex-1 flex-col md:flex-row overflow-visible md:overflow-hidden">
-          <FormularioPresupuesto quote={quote} setQuote={setQuote} />
-          <div className="zona-documento flex-1 md:h-full overflow-visible md:overflow-y-auto py-8 flex justify-center">
-            <DocumentoPresupuesto quote={quote} />
+        {tabActivo === 'presupuesto' ? (
+          <div className="flex flex-1 flex-row overflow-hidden">
+            <FormularioPresupuesto quote={quote} setQuote={setQuote} />
+            <div className="zona-documento flex-1 h-full overflow-y-auto py-8 flex justify-center">
+              <DocumentoPresupuesto quote={quote} />
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-1 flex-col md:flex-row overflow-visible md:overflow-hidden">
-          <FormularioFactura factura={factura} setFactura={setFactura} />
-          <div className="zona-documento flex-1 md:h-full overflow-visible md:overflow-y-auto py-8 flex justify-center">
-            <DocumentoFactura factura={factura} />
+        ) : (
+          <div className="flex flex-1 flex-row overflow-hidden">
+            <FormularioFactura factura={factura} setFactura={setFactura} />
+            <div className="zona-documento flex-1 h-full overflow-y-auto py-8 flex justify-center">
+              <DocumentoFactura factura={factura} />
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   )
 }
 
