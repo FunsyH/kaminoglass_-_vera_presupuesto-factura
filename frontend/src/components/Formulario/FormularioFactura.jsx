@@ -35,7 +35,7 @@ function FormularioFactura({ factura, setFactura }) {
   }
 
   return (
-    <div className="no-print w-full md:w-[480px] md:shrink-0 h-auto md:h-full overflow-visible md:overflow-y-auto bg-white border-r border-gray-200 p-5">
+    <div className="no-print w-[480px] shrink-0 h-full overflow-y-auto bg-white border-r border-gray-200 p-5">
       <h1 className="text-lg font-semibold text-kng-ink mb-4">
         Facturas · KNG &amp; VERA
       </h1>
